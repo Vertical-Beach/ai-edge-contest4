@@ -1,5 +1,5 @@
 # ML-Caffe-Segmentation-Tutorial
-The following is a **tutorial** on how to **train, quantize, compile, and deploy** various segmentation networks including: **ENet, ESPNet, FPN, UNet, and a reduced compute version of UNet that we'll call Unet-lite** using Vitis-AI.  The training dataset used for this tutorial is the **Cityscapes dataset**, and the **Caffe** framework is used for training the models. After training, the **Vitis-AI tools** are used to quantize and compile the models, and ARM C++ application examples are included for deploying the models on a Xilinx **ZCU102** target board.  For background information on ESPNet, ENet, and general segmentation approaches, the [Segmentation Introduction Presentation](files/PDF/Segmentation_Introduction.pdf) has been provided.
+The following is a **tutorial** on how to **train, quantize, compile, and deploy** various segmentation networks including: **ENet, ESPNet, FPN, UNet, and a reduced compute version of UNet that we'll call Unet-lite** using Vitis AI.  The training dataset used for this tutorial is the **Cityscapes dataset**, and the **Caffe** framework is used for training the models. After training, the **Vitis AI tools** are used to quantize and compile the models, and ARM C++ application examples are included for deploying the models on a Xilinx **ZCU102** target board.  For background information on ESPNet, ENet, and general segmentation approaches, the [Segmentation Introduction Presentation](files/PDF/Segmentation_Introduction.pdf) has been provided.
 
 Note that the goal of this tutorial is not to provide optimized high accuracy models, but rather to provide a framework and guidance under which segmentation models can be trained and deployed on Xilinx MPSoCs.
 
@@ -21,7 +21,7 @@ The tutorial is organized as follows:
 
 # Pre-Install Considerations for Caffe for Segmentation Models
 
-The Vitis-AI tools come with a version of caffe that is supported for training the various segmentation models.  Section 1 will address the various setup steps required for configuring your environment with the Vitis-AI tools.
+The Vitis AI tools come with a version of caffe that is supported for training the various segmentation models.  Section 1 will address the various setup steps required for configuring your environment with the Vitis AI tools.
 
 # 1.0 Environment Setup and Installation
 
@@ -32,11 +32,11 @@ Note that these networks have also been tested with the older DNNDK v3.0/v3.1 an
 This tutorial was tested with a ZCU102 revision 1.0 (newer should also be ok),
 Displayport monitor, keyboard, mouse, and USB hub with USB micro converter.
 
-The Vitis-AI release used for testing this tutorial is [Vitis-AI-1.0](https://github.com/Xilinx/Vitis-AI/tree/v1.0).
+The Vitis AI release used for testing this tutorial is [Vitis AI 1.0](https://github.com/Xilinx/Vitis-AI/tree/v1.0).
 
 ## 1.1 PART 1: Vitis AI Environment Setup and Board Package Installation:
 
-1) Install the Vitis-AI GPU tools via the following steps:
+1) Install the Vitis AI GPU tools via the following steps:
 
 ```
 git clone https://github.com/Xilinx/Vitis-AI
