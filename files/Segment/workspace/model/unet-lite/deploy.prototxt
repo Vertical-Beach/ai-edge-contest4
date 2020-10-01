@@ -6,8 +6,8 @@ layer {
     shape {
       dim: 1
       dim: 3
+      dim: 256
       dim: 512
-      dim: 1024
     }
   }
 }
@@ -918,7 +918,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 19
+    num_output: 5
     pad: 0
     kernel_size: 1
     weight_filler {
