@@ -1,24 +1,37 @@
 name: "unet"
+# layer {
+#   name: "data"
+#   type: "ImageSegData"
+#   top: "data"
+#   top: "label"
+#   transform_param {
+#     crop_size: 512
+#     mean_value: 73
+#     mean_value: 82
+#     mean_value: 72
+#     scale: 0.022
+#   }
+#   image_data_param {
+#     source: "/workspace/Segment/workspace/data/cityscapes/img_seg.txt"
+#     batch_size: 4
+#     shuffle: true
+#     mirror: true
+#   }
+#  include {
+#    phase: TRAIN
+#   }
+# }
 layer {
   name: "data"
-  type: "ImageSegData"
+  type: "Python"
   top: "data"
   top: "label"
-  transform_param {
-    crop_size: 512
-    mean_value: 73
-    mean_value: 82
-    mean_value: 72
-    scale: 0.022
-  }
-  image_data_param {
-    source: "/workspace/Segment/workspace/data/cityscapes/img_seg.txt"
-    batch_size: 4
-    shuffle: true
-    mirror: true
-  }
- include {
-   phase: TRAIN
+  python_param {
+    module: "voc_layers"
+    # layer: "BDD100KDataLayer"
+    # param_str: "{\'batch_size\': 4, \'resize_size_y\':256, \'resize_size_x\':512, \'bdd100k_label_dir\': \'../../data/bdd100k/seg/labels/train\', \'bdd100k_image_dir\': \'../../data/bdd100k/seg/images/train\', \'seed\': 1337, \'filelist\': \'../../data/bdd100k/seg/train_files.txt\', \'mean\': (0.287, 0.325, 0.284), \'scale\': 0.022}"
+    layer: "SignateDataLayer"
+    param_str: "{\'batch_size\': 4, \'resize_size_y\':256, \'resize_size_x\':512, \'signate_label_dir\': \'../../data/signate/seg_train_dat\', \'signate_image_dir\': \'../../data/signate/seg_train_images\', \'seed\': 1337, \'filelist\': \'../../data/signate/filelist.txt\', \'mean\': (0.287, 0.325, 0.284), \'scale\': 0.022}"
   }
 }
 
@@ -930,7 +943,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 19
+    num_output: 5
     pad: 0
     kernel_size: 1
     weight_filler {
