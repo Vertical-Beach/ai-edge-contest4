@@ -43,6 +43,7 @@ class BDD100KDataLayer(caffe.Layer):
         self.resize_size_x = int(params.get('resize_size_x', 512))
         self.scale = params.get('scale', 0.022)
         self.batch_size = int(params.get('batch_size', 4))
+        self.data_on_memory = params.get('data_on_memory', False)
 
         # two tops: data and label
         if len(top) != 2:
@@ -56,10 +57,11 @@ class BDD100KDataLayer(caffe.Layer):
         self.datas = []
         self.labels = []
         # self.datapaths = self.datapaths[:1]
-        for i, datapath in enumerate(self.datapaths):
-            print("loading " + str(i))
-            self.datas.append(self.load_image(datapath))
-            self.labels.append(self.load_label(datapath))
+        if self.data_on_memory:
+            for i, datapath in enumerate(self.datapaths):
+                print("loading " + str(i))
+                self.datas.append(self.load_image(datapath))
+                self.labels.append(self.load_label(datapath))
 
         random.seed(self.seed)
 
@@ -73,8 +75,12 @@ class BDD100KDataLayer(caffe.Layer):
         # assign output
         for i in range(self.batch_size):
             idx = random.randint(0, len(self.datapaths)-1)
-            top[0].data[i, ...] = self.datas[idx]
-            top[1].data[i, ...] = self.labels[idx]
+            if self.data_on_memory:
+                top[0].data[i, ...] = self.datas[idx]
+                top[1].data[i, ...] = self.labels[idx]
+            else:
+                top[0].data[i, ...] = self.load_image(self.datapaths[idx])
+                top[1].data[i, ...] = self.load_label(self.datapaths[idx])
 
     def backward(self, top, propagate_down, bottom):
         pass
@@ -108,7 +114,7 @@ class BDD100KDataLayer(caffe.Layer):
         img = np.asarray(pil_img)
         #car 13 road 0 person 11 signal 6
         OTHER = 4
-        img = np.where((img != 0) & (img != 6) & (img != 11) & (img != 13), OTHER, img)
+        img = np.where((img != 0) & (img != 6)  & (img != 11) & (img != 13), OTHER, img)
         #road 0 person 1 signal 2 car 3 other 4 
         img = np.where(img == 11, 1, img)
         img = np.where(img == 6, 2, img)
@@ -154,6 +160,7 @@ class SignateDataLayer(caffe.Layer):
         self.resize_size_x = int(params.get('resize_size_x', 512))
         self.scale = params.get('scale', 0.022)
         self.batch_size = int(params.get('batch_size', 4))
+        self.data_on_memory = params.get('data_on_memory', False)
 
         # two tops: data and label
         if len(top) != 2:
@@ -167,10 +174,11 @@ class SignateDataLayer(caffe.Layer):
         self.datas = []
         self.labels = []
         # self.datapaths = self.datapaths[:1]
-        for i, datapath in enumerate(self.datapaths):
-            print("loading " + str(i))
-            self.datas.append(self.load_image(datapath))
-            self.labels.append(self.load_label(datapath))
+        if self.data_on_memory:
+            for i, datapath in enumerate(self.datapaths):
+                print("loading " + str(i))
+                self.datas.append(self.load_image(datapath))
+                self.labels.append(self.load_label(datapath))
 
         random.seed(self.seed)
 
@@ -184,8 +192,12 @@ class SignateDataLayer(caffe.Layer):
         # assign output
         for i in range(self.batch_size):
             idx = random.randint(0, len(self.datapaths)-1)
-            top[0].data[i, ...] = self.datas[idx]
-            top[1].data[i, ...] = self.labels[idx]
+            if self.data_on_memory:
+                top[0].data[i, ...] = self.datas[idx]
+                top[1].data[i, ...] = self.labels[idx]
+            else:
+                top[0].data[i, ...] = self.load_image(self.datapaths[idx])
+                top[1].data[i, ...] = self.load_label(self.datapaths[idx])
 
     def backward(self, top, propagate_down, bottom):
         pass
