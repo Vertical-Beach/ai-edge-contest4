@@ -1,4 +1,4 @@
-net: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/model/unet-lite/train_val.prototxt" 
+net: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/model/unet-lite/train_val_signate.prototxt"
 base_lr: 0.0005
 display: 1
 max_iter: 24000
@@ -7,7 +7,7 @@ gamma: 0.1
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 1000
-snapshot_prefix: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/model/unet-lite/final_models/"
+snapshot_prefix: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/model/unet-lite/final_models/signate/"
 solver_mode: GPU
 snapshot_after_train: true
 test_initialization: false
