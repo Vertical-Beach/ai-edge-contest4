@@ -20,7 +20,7 @@ vector<string> get_file_path(string input_dir) {
     glob_t globbuf;
     vector<string> files;
     auto glob_files = [&](const string& suffix) {
-        glob((input_dir + "*." + suffix).c_str(), 0, NULL, &globbuf);
+        glob((input_dir + "/*." + suffix).c_str(), 0, NULL, &globbuf);
         for (size_t i = 0; i < globbuf.gl_pathc; i++) {
             files.push_back(globbuf.gl_pathv[i]);
         }
@@ -95,11 +95,13 @@ void process(const string& img_path,
 int main(int argc, char *argv[]) {
     try {
         const bool flip = (1 < argc && string(argv[1]) == "flip") ? true : false;
-        const auto img_path  = getenv("SIGNATE_TRAIN_IMG_DIR");
-        const auto anno_path = getenv("SIGNATE_TRAIN_ANNO_DIR");
-        if (img_path == nullptr || anno_path == nullptr) {
-            throw std::logic_error("[FATAL ERROR] Please set environment value: SIGNATE_TRAIN_IMG_DIR and SIGNATE_TRAIN_ANNO_DIR");
-        }
+        const auto img_env_path  = getenv("SIGNATE_TRAIN_IMG_DIR");
+        const auto anno_env_path = getenv("SIGNATE_TRAIN_ANNO_DIR");
+        const auto img_path  = (img_env_path != nullptr) ? img_env_path : "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images";
+        const auto anno_path = (anno_env_path != nullptr) ? anno_env_path : "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_annotations";
+
+        std::cout << "the path of image data:      " << img_path << std::endl;
+        std::cout << "the path of annotation data: " << anno_path << std::endl;
 
         vector<string> img_files = get_file_path(img_path);
         vector<string> anno_files = get_file_path(anno_path);
