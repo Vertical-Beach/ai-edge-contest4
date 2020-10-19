@@ -62,7 +62,7 @@ if __name__ == '__main__':
     input_shape = net.blobs['data'].data.shape
     output_shape = net.blobs['conv_u0d-score_New'].data.shape
 
-    paths = glob.glob("/workspace/seg_test_images/*.jpg")
+    paths = glob.glob("/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_test_images/*jpg")
     paths = sorted(list(paths))
     for path in paths:
         print(path)

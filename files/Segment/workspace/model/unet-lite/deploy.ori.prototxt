@@ -1,41 +1,16 @@
-name: "unet"
-# layer {
-#   name: "data"
-#   type: "ImageSegData"
-#   top: "data"
-#   top: "label"
-#   transform_param {
-#     crop_size: 512
-#     mean_value: 73
-#     mean_value: 82
-#     mean_value: 72
-#     scale: 0.022
-#   }
-#   image_data_param {
-#     source: "/workspace/Segment/workspace/data/cityscapes/img_seg.txt"
-#     batch_size: 4
-#     shuffle: true
-#     mirror: true
-#   }
-#  include {
-#    phase: TRAIN
-#   }
-# }
 layer {
   name: "data"
-  type: "Python"
+  type: "Input"
   top: "data"
-  top: "label"
-  python_param {
-    module: "voc_layers"
-    # layer: "BDD100KDataLayer"
-    # param_str: "{\'batch_size\': 4, \'resize_size_y\':256, \'resize_size_x\':512, \'bdd100k_label_dir\': \'../../data/bdd100k/seg/labels/train\', \'bdd100k_image_dir\': \'../../data/bdd100k/seg/images/train\', \'seed\': 1337, \'filelist\': \'../../data/bdd100k/seg/train_files.txt\', \'mean\': (0.287, 0.325, 0.284), \'scale\': 0.022}"
-    layer: "SignateDataLayer"
-    param_str: "{\'batch_size\': 4, \'resize_size_y\':256, \'resize_size_x\':512, \'signate_label_dir\': \'../../data/signate/seg_train_dat\', \'signate_image_dir\': \'../../data/signate/seg_train_images\', \'seed\': 1337, \'filelist\': \'../../data/signate/filelist.txt\', \'mean\': (0.287, 0.325, 0.284), \'scale\': 0.022}"
+  input_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 512
+      dim: 1024
+    }
   }
 }
-
-
 layer {
   name: "conv_d0a-b"
   type: "Convolution"
@@ -449,7 +424,7 @@ layer {
   bottom: "BatchNorm_1"
   top: "relu_d3c"
 }
-  
+
 layer {
   name: "pool_d3c-4a"
   type: "Pooling"
@@ -556,7 +531,7 @@ layer {
   bottom: "d4c"
   top: "relu_d4c"
 }
-  
+
 layer {
   name: "upconv_d4c_u3a"
   type: "Deconvolution"
@@ -943,39 +918,18 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 5
+    num_output: 19
     pad: 0
     kernel_size: 1
     weight_filler {
       type: "msra"
     }
    }
-}#============loss=======
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "conv_u0d-score_New"
-  bottom: "label"
-  top: "loss"
-  loss_param {
-    ignore_label: 255
-  }
-  include {
-   phase: TRAIN
-  }
 }
-#===========accurcay=====
+
 layer {
-  name: "acc"
-  type: "Accuracy"
+  name: "score"
+  type: "Softmax"
   bottom: "conv_u0d-score_New"
-  bottom: "label"
-  top: "acc"
-  top: "per_acc"
-  accuracy_param {
-  ignore_label: 255
-  }
-  include {
-   phase: TRAIN
-  }
+  top: "score"
 }
