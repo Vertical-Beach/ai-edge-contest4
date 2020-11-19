@@ -2,8 +2,8 @@ PROJECT   =    segmentation
 OBJ       :=   main.o  
 
 
-CXX       :=   g++
-CC        :=   gcc
+CXX       ?=   g++
+CC        ?=   gcc
 
 # linking libraries of OpenCV
 LDFLAGS   = $(shell pkg-config --libs opencv)
@@ -20,12 +20,7 @@ MODEL = $(CUR_DIR)/model/dpu_segmentation_0.elf
 
 ARCH    =   $(shell uname -m | sed -e s/arm.*/armv71/ -e s/aarch64.*/aarch64/)
 CFLAGS :=   -O2 -Wall -Wpointer-arith -std=c++11 -ffast-math -I../common/
-ifeq ($(ARCH),armv71)
-    CFLAGS += -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -I../common/
-endif
-ifeq ($(ARCH),aarch64)
-    CFLAGS += -mcpu=cortex-a53 -I../common/
-endif
+CFLAGS += -mcpu=cortex-a53 -I../common/
  
 all: $(BUILD) $(PROJECT)
  
