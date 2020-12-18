@@ -8,8 +8,8 @@ layer {
     phase:TRAIN
   }
   image_data_param {
-    source: "/workspace/Segment/VAI/data/cityscapes/calibration.txt"
-    root_folder:"/workspace/Segment/VAI/data/cityscapes/calibration_images/"
+    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_calibration.txt"
+    root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images/"
     batch_size: 1
     new_height: 256
     new_width: 512
@@ -4056,7 +4056,7 @@ layer {
   name: "toplayer_p2"
   type: "Deconvolution"
   convolution_param {
-    num_output: 19
+    num_output: 5
     kernel_size: 4
     pad: 0
     stride: 4

@@ -9,24 +9,24 @@ kernel list info for network "segmentation"
                              Kernel Name : segmentation_0
 --------------------------------------------------------------------------------
                              Kernel Type : DPUKernel
-                               Code Size : 0.78MB
-                              Param Size : 5.85MB
-                           Workload MACs : 35028.73MOPS
-                         IO Memory Space : 17.27MB
+                               Code Size : 0.33MB
+                              Param Size : 5.84MB
+                           Workload MACs : 8639.74MOPS
+                         IO Memory Space : 4.32MB
                               Mean Value : 73, 82, 72, 
                       Total Tensor Count : 129
                 Boundary Input Tensor(s)   (H*W*C)
-                               data:0(0) : 512*1024*3
+                               data:0(0) : 256*512*3
 
                Boundary Output Tensor(s)   (H*W*C)
-                        toplayer_p2:0(0) : 512*1024*19
+                        toplayer_p2:0(0) : 256*512*5
 
                         Total Node Count : 95
                            Input Node(s)   (H*W*C)
-                         conv1_7x7_s2(0) : 512*1024*3
+                         conv1_7x7_s2(0) : 256*512*3
 
                           Output Node(s)   (H*W*C)
-                          toplayer_p2(0) : 512*1024*19
+                          toplayer_p2(0) : 256*512*5
 
 
 
@@ -35,16 +35,16 @@ kernel list info for network "segmentation"
 --------------------------------------------------------------------------------
                              Kernel Type : CPUKernel
                 Boundary Input Tensor(s)   (H*W*C)
-                              score:0(0) : 512*1024*19
+                              score:0(0) : 256*512*5
 
                Boundary Output Tensor(s)   (H*W*C)
-                              score:0(0) : 512*1024*19
+                              score:0(0) : 256*512*5
 
                            Input Node(s)   (H*W*C)
-                                   score : 512*1024*19
+                                   score : 256*512*5
 
                           Output Node(s)   (H*W*C)
-                                   score : 512*1024*19
+                                   score : 256*512*5
 
 
 
