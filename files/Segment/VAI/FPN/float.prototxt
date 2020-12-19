@@ -8,11 +8,13 @@ layer {
     phase:TRAIN
   }
   image_data_param {
-    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_calibration.txt"
-    root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images/"
+    # source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_calibration.txt"
+    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_test_calibration.txt"
+    # root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images/"
+    root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_test_images/"
     batch_size: 1
-    new_height: 256
-    new_width: 512
+    new_height: 480
+    new_width: 960
     shuffle: true
   }
   transform_param {
@@ -24,8 +26,8 @@ layer {
     resize_param {
       prob: 1.0
       resize_mode: WARP
-      height: 256
-      width: 512
+      height: 480
+      width: 960
     }
   }
 }

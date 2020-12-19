@@ -14,17 +14,17 @@ layer {
     resize_param {
       prob: 1
       resize_mode: WARP
-      height: 256
-      width: 512
+      height: 480
+      width: 960
     }
   }
   image_data_param {
-    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_calibration.txt"
+    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_test_calibration.txt"
     batch_size: 1
     shuffle: true
-    new_height: 256
-    new_width: 512
-    root_folder: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images/"
+    new_height: 480
+    new_width: 960
+    root_folder: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_test_images/"
   }
 }
 layer {

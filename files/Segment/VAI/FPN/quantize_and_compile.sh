@@ -16,8 +16,10 @@ output_dir=compile
 #           -gpu $GPUID \
 #           -calib_iter 1000 \
 #           -output_dir ${model_dir} 2>&1 | tee ${model_dir}/quantize.txt
+        #   -test_iter 500 \
+        #   -auto_test \
 
-# echo "Compiling network: ${net}"
+echo "Compiling network: ${net}"
 
 vai_c_caffe   --prototxt=${model_dir}/deploy.prototxt \
         --caffemodel=${model_dir}/deploy.caffemodel \

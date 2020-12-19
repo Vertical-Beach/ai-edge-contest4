@@ -8,11 +8,13 @@ layer {
     phase:TRAIN
   }
   image_data_param {
-    source: "/workspace/Segment/VAI/data/cityscapes/calibration.txt"
-    root_folder:"/workspace/Segment/VAI/data/cityscapes/calibration_images/"
+    # source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_calibration.txt"
+    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_test_calibration.txt"
+    # root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images/"
+    root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_test_images/"
     batch_size: 1
-    new_height: 512
-    new_width: 1024
+    new_height: 480
+    new_width: 960
     shuffle: true
   }
   transform_param {
@@ -24,8 +26,8 @@ layer {
     resize_param {
       prob: 1.0
       resize_mode: WARP
-      height: 512
-      width: 1024
+      height: 480
+      width: 960
     }
   }
 }
@@ -40,7 +42,8 @@ layer {
   }
   image_data_param {
     #Testing use LableId.png as label as "SegmentPixelIoU" will finish relabel similar to that in "relabel_label.py"
-    source: "../data/val_img_seg_nomap.txt"
+    # source: "../data/val_img_seg_nomap.txt"
+    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_quantize_test.txt"
    # root_folder: "/home/zhangshuai/dataset/seg_cityscapes/"
     batch_size: 1
     shuffle: false
@@ -67,8 +70,8 @@ layer {
   deephi_resize_param {
 #    new_height: 256
 #    new_width: 512
-    new_height: 512
-    new_width: 1024
+    new_height: 480
+    new_width: 960
  #   new_height: 1024
  #   new_width: 2048
     resize_type: 0
@@ -4101,7 +4104,7 @@ layer {
   name: "toplayer_p2"
   type: "Deconvolution"
   convolution_param {
-    num_output: 19
+    num_output: 5
     kernel_size: 4
     pad: 0
     stride: 4
