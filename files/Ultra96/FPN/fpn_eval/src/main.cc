@@ -49,7 +49,7 @@ using namespace cv;
 #define KERNEL_CONV "segmentation_0"
 #define CONV_INPUT_NODE "conv1_7x7_s2"
 #define CONV_OUTPUT_NODE "toplayer_p2"
-string seg_test_images = "./seg_test_images/";
+string seg_test_images = "../seg_test_images/";
 
 // flags for each thread
 bool is_reading = true;
@@ -83,7 +83,6 @@ int dpuSetInputImageWithScale(DPUTask *task, const char* nodeName, const cv::Mat
 
     inputAddr = dpuGetInputTensorAddress(task, nodeName, idx);
     scaleFix = dpuGetInputTensorScale(task, nodeName, idx);
-    std::cout << "scaleFixOfInputLayer: " << scaleFix << std::endl;
     scaleFix = scaleFix*scale;
 
     if (newImage.channels() == 1) {
