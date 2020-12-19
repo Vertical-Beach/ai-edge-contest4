@@ -55,7 +55,7 @@ string seg_test_images = "./seg_test_images/";
 bool is_reading = true;
 bool is_running_1 = true;
 
-queue<pair<string, Mat>> read_queue;     // read queue
+queue<pair<string, string>> read_queue;     // read queue
 mutex mtx_read_queue;     	 			 // mutex of read queue                                  
 
 
@@ -83,7 +83,7 @@ int dpuSetInputImageWithScale(DPUTask *task, const char* nodeName, const cv::Mat
 
     inputAddr = dpuGetInputTensorAddress(task, nodeName, idx);
     scaleFix = dpuGetInputTensorScale(task, nodeName, idx);
-
+    std::cout << "scaleFixOfInputLayer: " << scaleFix << std::endl;
     scaleFix = scaleFix*scale;
 
     if (newImage.channels() == 1) {
@@ -173,7 +173,8 @@ void runSegmentation(DPUTask *task, bool &is_running) {
             break;
         } else {
             filename = read_queue.front().first;
-            img = read_queue.front().second;
+            string img_path = read_queue.front().second;
+            img = imread(img_path);
             read_queue.pop();
             mtx_read_queue.unlock();
         }
@@ -226,7 +227,7 @@ void runSegmentation(DPUTask *task, bool &is_running) {
  * @return none
  */
 void Read(void) {
-    cout <<"...This routine assumes all images fit into DDR Memory..." << endl;
+    // cout <<"...This routine assumes all images fit into DDR Memory..." << endl;
     cout <<"Reading Validation Images " << endl;
     ListImages(seg_test_images, images);
         if (images.size() == 0) {
@@ -239,11 +240,12 @@ void Read(void) {
         string img_result_name;
         for (unsigned int img_idx=0; img_idx<images.size(); img_idx++) {
                 cout << seg_test_images + images.at(img_idx) << endl;
-                img = imread(seg_test_images + images.at(img_idx));                                                     
+                // img = imread(seg_test_images + images.at(img_idx));                                                     
+                string img_path = seg_test_images + images.at(img_idx);                                                     
                 img_result_name = "results/" + images.at(img_idx);
                 img_result_name.erase(img_result_name.end()-4,img_result_name.end());
                 img_result_name += ".png";
-                read_queue.push(make_pair(img_result_name, img));
+                read_queue.push(make_pair(img_result_name, img_path));
             }
     images.clear();
     cout << "...processing..." << endl;
