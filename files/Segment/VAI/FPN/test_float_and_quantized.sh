@@ -2,7 +2,7 @@ export GPUID=0
 export WKDIR=`pwd`
 
 cd $WKDIR
-vai_q_caffe test -model float_test.prototxt -weights float.caffemodel -test_iter 500 -gpu $GPUID 2>&1 | tee test_results/float_model_test.txt
+vai_q_caffe test -model float_test.prototxt -weights float.caffemodel -test_iter 500 -seg_class_num 5 -gpu $GPUID 2>&1 | tee test_results/float_model_test.txt
 
 #working directory
 work_dir=$(pwd)
@@ -14,6 +14,7 @@ output_dir=${work_dir}/decent_output
 vai_q_caffe quantize            \
           -model ${model_dir}/float_test.prototxt     \
           -weights ${model_dir}/float.caffemodel \
+          -seg_class_num 5 \
           -gpu $GPUID \
           -calib_iter 1000 \
           -test_iter 500 \

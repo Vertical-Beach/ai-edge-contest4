@@ -9,13 +9,14 @@ model_dir=quantize
 #output directory
 output_dir=compile
 
-# echo "quantizing network: $(pwd)/float.prototxt"
-# vai_q_caffe quantize          \
-#           -model $(pwd)/float.prototxt     \
-#           -weights $(pwd)/float.caffemodel \
-#           -gpu $GPUID \
-#           -calib_iter 1000 \
-#           -output_dir ${model_dir} 2>&1 | tee ${model_dir}/quantize.txt
+echo "quantizing network: $(pwd)/float.prototxt"
+vai_q_caffe quantize          \
+          -model $(pwd)/float.prototxt     \
+          -weights $(pwd)/float.caffemodel \
+          -seg_class_num 5 \
+          -gpu $GPUID \
+          -calib_iter 1000 \
+          -output_dir ${model_dir} 2>&1 | tee ${model_dir}/quantize.txt
         #   -test_iter 500 \
         #   -auto_test \
 
