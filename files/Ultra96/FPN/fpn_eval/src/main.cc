@@ -157,8 +157,10 @@ void runSegmentation(DPUTask *task, bool &is_running) {
     int outHeight = dpuGetTensorHeight(conv_out_tensor);
     int outWidth = dpuGetTensorWidth(conv_out_tensor);
     int8_t *outTensorAddr = dpuGetTensorAddress(conv_out_tensor);
-    float mean[3]={73.0,82.0,72.0};
-    float scale = 0.022;
+    // float mean[3]={73.0,82.0,72.0};
+    float mean[3]={104, 117, 123};
+    // float scale = 0.022;
+    float scale = 1.0f;
 
     // Run detection for images in read queue
     while (is_running) {
