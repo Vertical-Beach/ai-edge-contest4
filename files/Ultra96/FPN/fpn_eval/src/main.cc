@@ -481,7 +481,7 @@ int main() {
             std::cout << "[INFO] Perform inference for the "
                       << idx_offset + 1
                       << "th to "
-                      << idx_offset + buffer_size + 1
+                      << idx_offset + buffer_size
                       << "th images."
                       << std::endl;
 
@@ -506,7 +506,7 @@ int main() {
             if constexpr (!DEBUG_MODE) {
                 elapsed_time_ms += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / (double)1e3;
                 std::cout << "[INFO] Average elapsed time of inference for the 1th to "
-                          << idx_offset + buffer_size + 1
+                          << idx_offset + buffer_size
                           << "th : "
                           << elapsed_time_ms / (idx_offset + buffer_size)
                           << " ms"
