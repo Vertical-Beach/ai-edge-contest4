@@ -430,14 +430,25 @@ int main() {
         dpu_inout_info.in_size.height  = dpuGetInputTensorHeight(task_conv_1, CONV_INPUT_NODE.c_str(), 0);
         dpu_inout_info.in_size.width   = dpuGetInputTensorWidth(task_conv_1, CONV_INPUT_NODE.c_str(), 0);
         dpu_inout_info.in_channel      = dpuGetInputTensorChannel(task_conv_1, CONV_INPUT_NODE.c_str(), 0);
-        dpu_inout_info.in_scale_fix    = dpuGetInputTensorScale(task_conv_1, CONV_INPUT_NODE.c_str(), 0) * DPU_INPUT_IMG_SCALE;
-        dpu_inout_info.in_addr         = dpuGetInputTensorAddress(task_conv_1, CONV_INPUT_NODE.c_str(), 0);
         dpu_inout_info.out_size.height = dpuGetTensorHeight(conv_out_tensor);
         dpu_inout_info.out_size.width  = dpuGetTensorWidth(conv_out_tensor);
-        dpu_inout_info.out_channel     = DPU_OUTPUT_IMG_CHANNEL;
-        dpu_inout_info.out_addr        = dpuGetTensorAddress(conv_out_tensor);
 
+        const auto validate_dpu_inout = [](const bool& cond, const std::string& e_str) -> void {
+            if (!cond) {
+                throw std::logic_error("[ERROR] DPU in/out parameter is invalid : " + e_str);
+            }
+        };
+        validate_dpu_inout(dpu_inout_info.in_size.width == DPU_INPUT_IMG_WIDTH, "input width");
+        validate_dpu_inout(dpu_inout_info.in_size.height == DPU_INPUT_IMG_HEIGHT, "input height");
+        validate_dpu_inout(dpu_inout_info.in_channel == DPU_INPUT_IMG_CHANNEL, "input channel");
+        validate_dpu_inout(dpu_inout_info.out_size.width == DPU_OUTPUT_IMG_WIDTH, "output width");
+        validate_dpu_inout(dpu_inout_info.out_size.height == DPU_OUTPUT_IMG_HEIGHT, "output height");
+
+        dpu_inout_info.in_addr         = dpuGetInputTensorAddress(task_conv_1, CONV_INPUT_NODE.c_str(), 0);
+        dpu_inout_info.in_scale_fix    = dpuGetInputTensorScale(task_conv_1, CONV_INPUT_NODE.c_str(), 0) * DPU_INPUT_IMG_SCALE;
         std::copy(DPU_INPUT_IMG_MEAN.begin(), DPU_INPUT_IMG_MEAN.end(), dpu_inout_info.in_mean);
+        dpu_inout_info.out_addr        = dpuGetTensorAddress(conv_out_tensor);
+        dpu_inout_info.out_channel     = DPU_OUTPUT_IMG_CHANNEL;
 
         std::cout << "[INFO] DPU information : " << dpu_inout_info << std::endl;
 
