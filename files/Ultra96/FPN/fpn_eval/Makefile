@@ -19,7 +19,7 @@ VPATH     =   $(SRC)
 MODEL = $(CUR_DIR)/model/dpu_segmentation_0.elf
 
 ARCH    =   $(shell uname -m | sed -e s/arm.*/armv71/ -e s/aarch64.*/aarch64/)
-CFLAGS :=   -O2 -Wall -Wpointer-arith -std=c++11 -ffast-math -I../common/
+CFLAGS :=   -O2 -Wall -Wpointer-arith -std=c++17 -ffast-math -I../common/
 CFLAGS += -mcpu=cortex-a53 -I../common/
  
 all: $(BUILD) $(PROJECT)
