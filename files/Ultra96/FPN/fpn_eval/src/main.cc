@@ -159,6 +159,10 @@ namespace {
         }
 
         bool neverReadNextElement() {
+            std::unique_lock<std::mutex> lock_r_func(r_func_guard_, std::try_to_lock);
+            if (!lock_r_func.owns_lock()) {
+                throw std::runtime_error("[ERROR] The read function can't be called at the same time from multiple threads.");
+            }
             std::lock_guard<ObjWithMtx<ElementState>> lock_state(fifo_state_[r_idx_]);
             return (fifo_state_[r_idx_].obj == ElementState::INVALID_LAST);
         }
