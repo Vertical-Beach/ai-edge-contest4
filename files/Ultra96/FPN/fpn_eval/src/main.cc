@@ -501,6 +501,8 @@ int main() {
             }
         }
 
+        std::cout << "[INFO] Done." << std::endl;
+
         // Destroy DPU Tasks and Kernels and free resources
         dpuDestroyTask(task_conv_1);
         dpuDestroyKernel(kernel_conv);
