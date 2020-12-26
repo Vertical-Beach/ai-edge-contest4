@@ -478,7 +478,12 @@ int main() {
                 std::cout << "[INFO] Load : " << filepath << std::endl;
             }
 
-            std::cout << "[INFO] Perform inference for the " << idx_offset + 1 << "th to " << idx_offset + buffer_size << "th images." << std::endl;
+            std::cout << "[INFO] Perform inference for the "
+                      << idx_offset + 1
+                      << "th to "
+                      << idx_offset + buffer_size + 1
+                      << "th images."
+                      << std::endl;
 
             /***** START OF INFERENCE INCLUDING PRE/POST PROCESSES *****/
             const auto start_time = std::chrono::system_clock::now();
