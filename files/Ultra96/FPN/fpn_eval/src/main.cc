@@ -394,7 +394,7 @@ namespace {
                 }
             }
         }
-        std::sort(img_names);
+        std::sort(img_names.begin(), img_names.end());
 
         closedir(dir);
         return img_names;
