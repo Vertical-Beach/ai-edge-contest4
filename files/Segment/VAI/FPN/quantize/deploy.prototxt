@@ -10,16 +10,16 @@ layer {
     resize_param {
       prob: 1
       resize_mode: WARP
-      height: 480
-      width: 960
+      height: 384
+      width: 768
     }
   }
   input_param {
     shape {
       dim: 1
       dim: 3
-      dim: 480
-      dim: 960
+      dim: 384
+      dim: 768
     }
   }
 }
