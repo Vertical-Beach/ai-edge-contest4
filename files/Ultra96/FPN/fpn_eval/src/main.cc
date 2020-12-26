@@ -395,6 +395,7 @@ namespace {
                 }
             }
         }
+        std::sort(img_names);
 
         closedir(dir);
         return img_names;
@@ -411,7 +412,7 @@ int main() {
                 }
                 catch(...) {
                     std::lock_guard<ObjWithMtx<bool>> lock(no_abnormality);
-                    if (no_abnormality.obj == true) {
+                    if (no_abnormality.obj) {
                         no_abnormality.obj = false;
                         ep = std::current_exception();
                     }
@@ -496,7 +497,9 @@ int main() {
 
             if constexpr (!DEBUG_MODE) {
                 elapsed_time_ms += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / (double)1e3;
-                std::cout << "[INFO] Average elapsed time of inference including pre/post proc : "
+                std::cout << "[INFO] Average elapsed time of inference for the 1th to "
+                          << idx_offset + buffer_size + 1
+                          << "th : "
                           << elapsed_time_ms / (idx_offset + buffer_size)
                           << " ms"
                           << std::endl;
