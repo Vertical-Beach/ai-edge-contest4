@@ -275,8 +275,8 @@ namespace {
     }
 
     void do_inference() {
-        const auto in_byte_size  = sizeof(char) * dpu_inout_info.in_size.area() * dpu_inout_info.in_channel;
-        const auto out_byte_size = sizeof(char) * dpu_inout_info.out_size.area() * dpu_inout_info.out_channel;
+        constexpr auto in_byte_size  = sizeof(int8_t) * DPU_INPUT_IMG_WIDTH * DPU_INPUT_IMG_HEIGHT * DPU_INPUT_IMG_CHANNEL;
+        constexpr auto out_byte_size = sizeof(int8_t) * DPU_OUTPUT_IMG_WIDTH * DPU_OUTPUT_IMG_HEIGHT * DPU_OUTPUT_IMG_CHANNEL;
 
         auto end_flag = false;
         while (!end_flag) {
@@ -369,7 +369,7 @@ namespace {
     }
 
     std::vector<std::string> load_img_names(const std::string& path) {
-        const std::set<std::string> IMG_FILE_EXT = {
+        const std::set<std::string> img_file_ext = {
             "JPEG", "jpeg", "JPG", "jpg", "PNG", "png"
         };
 
@@ -390,7 +390,7 @@ namespace {
             if (entry->d_type == DT_REG || entry->d_type == DT_UNKNOWN) {
                 const std::string name = entry->d_name;
                 const std::string ext  = name.substr(name.find_last_of(".") + 1);
-                if (IMG_FILE_EXT.find(ext) != IMG_FILE_EXT.end()) {
+                if (img_file_ext.find(ext) != img_file_ext.end()) {
                     img_names.push_back(name);
                 }
             }
