@@ -239,7 +239,7 @@ namespace {
 #endif
 
     void do_preprocess() {
-        cv::Mat resized_img(dpu_inout_info.in_size, CV_8SC3);
+        cv::Mat resized_img(dpu_inout_info.in_size, CV_8UC3);
         for (size_t im_i = 0; im_i < read_buffer.size(); im_i++) {
             /***** PREPROCESS FOR INFERENCE *****/
 #if DEBUG_MODE
