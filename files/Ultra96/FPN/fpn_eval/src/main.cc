@@ -487,7 +487,11 @@ int main() {
             }
 
             for (size_t im_i = 0; im_i < buffer_size; im_i++) {
-                cv::imwrite(SEG_OUT_PATH + img_names[idx_offset + im_i], write_buffer[im_i]);
+                std::string out_filepath = SEG_OUT_PATH + img_names[idx_offset + im_i];
+                out_filepath  = out_filepath.substr(0, out_filepath.find_last_of("."));
+                out_filepath += ".png";
+                cv::imwrite(out_filepath, write_buffer[im_i]);
+                std::cout << "[INFO] Store : " << out_filepath << std::endl;
             }
         }
 
