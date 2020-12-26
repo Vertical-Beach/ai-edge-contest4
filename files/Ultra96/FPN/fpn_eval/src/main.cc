@@ -68,7 +68,7 @@ namespace {
         std::mutex mtx_;
     };
 
-    template<typename T, size_t N>
+    template<typename T, size_t D>
     class MultiThreadFIFO {
     public:
         explicit MultiThreadFIFO(const uint32_t& sleep_t_us = 100) :
@@ -167,13 +167,13 @@ namespace {
         enum class ElementState { VALID, VALID_LAST, INVALID, INVALID_LAST };
 
         void incrementIdx(size_t& idx) const {
-            idx = (idx < N - 1) ? idx + 1 : 0;
+            idx = (idx < D - 1) ? idx + 1 : 0;
         }
 
         const uint32_t sleep_t_us_;
 
-        std::array<ObjWithMtx<T>, N> fifo_;
-        std::array<ObjWithMtx<ElementState>, N> fifo_state_;
+        std::array<ObjWithMtx<T>, D> fifo_;
+        std::array<ObjWithMtx<ElementState>, D> fifo_state_;
         std::mutex r_func_guard_, w_func_guard_;
         size_t r_idx_{0}, w_idx_{0};
     };
@@ -208,8 +208,8 @@ namespace {
     const std::string CONV_OUTPUT_NODE  = "toplayer_p2";
 
     constexpr auto BATCH_SIZE             = 30U;
-    constexpr auto PREPROC_FIFO_SIZE      = 3U;
-    constexpr auto POSTPROC_FIFO_SIZE     = 3U;
+    constexpr auto PREPROC_FIFO_DEPTH     = 3U;
+    constexpr auto POSTPROC_FIFO_DEPTH    = 3U;
     constexpr auto SLEEP_T_US             = 100U;
     constexpr auto DPU_INPUT_IMG_WIDTH    = 960U;
     constexpr auto DPU_INPUT_IMG_HEIGHT   = 480U;
@@ -225,8 +225,8 @@ namespace {
     using PostprocFIFOElementType = std::array<int8_t, DPU_OUTPUT_IMG_WIDTH * DPU_OUTPUT_IMG_HEIGHT * DPU_OUTPUT_IMG_CHANNEL>;
 
     ObjWithMtx<bool> no_abnormality(true);
-    MultiThreadFIFO<PreprocFIFOElementType, PREPROC_FIFO_SIZE> preproc_fifo(SLEEP_T_US);
-    MultiThreadFIFO<PostprocFIFOElementType, POSTPROC_FIFO_SIZE> postproc_fifo(SLEEP_T_US);
+    MultiThreadFIFO<PreprocFIFOElementType, PREPROC_FIFO_DEPTH> preproc_fifo(SLEEP_T_US);
+    MultiThreadFIFO<PostprocFIFOElementType, POSTPROC_FIFO_DEPTH> postproc_fifo(SLEEP_T_US);
 
     DPUKernel* kernel_conv;
     DPUTask* task_conv_1;
