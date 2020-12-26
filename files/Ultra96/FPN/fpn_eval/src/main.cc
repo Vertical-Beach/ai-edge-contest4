@@ -442,6 +442,7 @@ int main() {
         std::cout << "[INFO] DPU information : " << dpu_inout_info << std::endl;
 
         const auto img_names = load_img_names(SEG_TEST_IMG_PATH);
+        auto elapsed_time_ms = 0.0;
         for (size_t bi = 0; bi < std::ceil(img_names.size() / (double)BATCH_SIZE); bi++) {
             const auto idx_offset  = bi * BATCH_SIZE;
             const auto buffer_size = std::min((uint32_t)(img_names.size() - idx_offset), BATCH_SIZE);
@@ -483,8 +484,12 @@ int main() {
             }
 
             if constexpr (!DEBUG_MODE) {
-                const auto elapsed_time_ms = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / (double)1e3;
-                std::cout << "[INFO] Average elapsed time of inference including pre/post proc : " << elapsed_time_ms / read_buffer.size() << " ms" << std::endl;
+                elapsed_time_ms += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / (double)1e3;
+                std::cout << "[INFO] Average elapsed time of inference including pre/post proc : "
+                          << elapsed_time_ms / (idx_offset + buffer_size)
+                          << " ms"
+                          << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
             }
 
             for (size_t im_i = 0; im_i < buffer_size; im_i++) {
