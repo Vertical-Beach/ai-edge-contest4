@@ -218,11 +218,10 @@ namespace {
     constexpr auto DPU_INPUT_IMG_MEAN     = {104.0f, 117.0f, 123.0f};
     constexpr auto DPU_OUTPUT_IMG_WIDTH   = 960U;
     constexpr auto DPU_OUTPUT_IMG_HEIGHT  = 480U;
-    constexpr auto DPU_OUTPUT_IMG_CHANNEL = 1U;
     constexpr auto DPU_OUTPUT_NOF_CLASS   = 5U;
 
     using PreprocFIFOElementType  = std::array<int8_t, DPU_INPUT_IMG_WIDTH * DPU_INPUT_IMG_HEIGHT * DPU_INPUT_IMG_CHANNEL>;
-    using PostprocFIFOElementType = std::array<int8_t, DPU_OUTPUT_IMG_WIDTH * DPU_OUTPUT_IMG_HEIGHT * DPU_OUTPUT_IMG_CHANNEL>;
+    using PostprocFIFOElementType = std::array<int8_t, DPU_OUTPUT_IMG_WIDTH * DPU_OUTPUT_IMG_HEIGHT * DPU_OUTPUT_NOF_CLASS>;
 
     ObjWithMtx<bool> no_abnormality(true);
     MultiThreadFIFO<PreprocFIFOElementType, PREPROC_FIFO_DEPTH> preproc_fifo(SLEEP_T_US);
@@ -276,7 +275,7 @@ namespace {
 
     void do_inference() {
         constexpr auto in_byte_size  = sizeof(int8_t) * DPU_INPUT_IMG_WIDTH * DPU_INPUT_IMG_HEIGHT * DPU_INPUT_IMG_CHANNEL;
-        constexpr auto out_byte_size = sizeof(int8_t) * DPU_OUTPUT_IMG_WIDTH * DPU_OUTPUT_IMG_HEIGHT * DPU_OUTPUT_IMG_CHANNEL;
+        constexpr auto out_byte_size = sizeof(int8_t) * DPU_OUTPUT_IMG_WIDTH * DPU_OUTPUT_IMG_HEIGHT * DPU_OUTPUT_NOF_CLASS;
 
         auto end_flag = false;
         while (!end_flag) {
@@ -449,7 +448,7 @@ int main() {
         dpu_inout_info.in_scale_fix    = dpuGetInputTensorScale(task_conv_1, CONV_INPUT_NODE.c_str(), 0) * DPU_INPUT_IMG_SCALE;
         std::copy(DPU_INPUT_IMG_MEAN.begin(), DPU_INPUT_IMG_MEAN.end(), dpu_inout_info.in_mean);
         dpu_inout_info.out_addr        = dpuGetTensorAddress(conv_out_tensor);
-        dpu_inout_info.out_channel     = DPU_OUTPUT_IMG_CHANNEL;
+        dpu_inout_info.out_channel     = DPU_OUTPUT_NOF_CLASS;
 
         std::cout << "[INFO] DPU information : " << dpu_inout_info << std::endl;
 
