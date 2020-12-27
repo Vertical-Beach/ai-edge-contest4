@@ -1,0 +1,86 @@
+\documentclass[11pt,a4j]{jarticle}
+
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{ascmac}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage[dvips,usenames,dvipdfmx]{color}
+\usepackage{colortbl}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage[top=30.5truemm,bottom=30.5truemm,left=22.5truemm,right=22.5truemm]{geometry}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\algtext*{EndIf}
+\algtext*{EndFor}
+\algtext*{EndWhile}
+
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+\newcommand{\Continue}{\textbf{continue}}
+\newcommand{\Break}{\textbf{break}}
+
+\definecolor{bl}{rgb}{0.94,0.97,1}
+\definecolor{gr}{rgb}{0.5,0.5,0.5}
+\makeatletter
+\def\section{\newpage\@startsection{section}{1}{\z@}{2.3ex plus -1ex minus -.2ex}{2.3 ex plus .2ex}{\Large\bf}}
+\makeatother
+
+\setstretch{1.5}
+
+\usepackage{fancyhdr}
+\lhead{\leftmark}
+\chead{}
+\rhead{\rightmark}
+\cfoot{\thepage}
+
+\rfoot{}
+\begin{document}
+\vspace*{2cm}
+\thispagestyle{empty}
+\begin{spacing}{1}
+  \begin{center}
+    {
+      \Large hoge
+    } \\[3.5truecm]
+    \LARGE
+    \Large チーム名 Vertical\_Beach \\
+    \Large lp6m, medalotte \\
+  \end{center}
+
+  \clearpage
+  \pagenumbering{roman}
+                {\fontsize{11pt}{15pt}\selectfont
+                  \tableofcontents
+                }
+\end{spacing}
+
+\clearpage
+\pagenumbering{arabic}
+\pagestyle{fancy}
+
+\input{1_introduction.tex}
+\input{2_HW_impl.tex}
+\input{3_SW_impl.tex}
+\input{4_evaluation.tex}
+\input{5_conclusion.tex}
+
+\pagestyle{plain}
+
+\bibliographystyle{jplain}
+\begin{thebibliography}{99}
+  \addcontentsline{toc}{section}{参考文献}
+
+\bibitem{hoge}
+  hoge
+
+\end{thebibliography}
+
+\section*{付録}
+\addcontentsline{toc}{section}{付録}
+
+\end{document}
