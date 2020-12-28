@@ -1,0 +1,16 @@
+参加チーム名： Vertical Beach
+処理性能：
+    全体処理： xxms
+        前処理：xxms
+        推論処理：xxms
+        後処理：xxms
+周波数：
+    周辺I/F部：200MHz
+    DPUベースクロック：200MHz
+    DPU DSPクロック：400MHz
+
+使用モデル：resnet18-FPN
+実装アプローチ： DNNDK & Vitis AI
+
+入賞した場合のオープンソースライセンス付与の同意確認
+・同意する
