@@ -28,7 +28,7 @@
 \definecolor{bl}{rgb}{0.94,0.97,1}
 \definecolor{gr}{rgb}{0.5,0.5,0.5}
 \makeatletter
-\def\section{\newpage\@startsection{section}{1}{\z@}{2.3ex plus -1ex minus -.2ex}{2.3 ex plus .2ex}{\Large\bf}}
+\def\section{\@startsection{section}{1}{\z@}{2.3ex plus -1ex minus -.2ex}{2.3 ex plus .2ex}{\Large\bf}}
 \makeatother
 
 \setstretch{1.5}
@@ -60,9 +60,9 @@
   %               }
 % \end{spacing}
 
-\clearpage
+% \clearpage
 \pagenumbering{arabic}
-\pagestyle{fancy}
+% \pagestyle{fancy}
 % \pagestyle{plain}
 \input{1_introduction.tex}
 \input{2_HW_impl.tex}
@@ -74,7 +74,7 @@
 \bibliographystyle{plain}
 % \bibliographystyle{junsrt}
 \bibliography{main.bib}
-
+\newpage
 \section*{付録}
 \addcontentsline{toc}{section}{付録}
 
