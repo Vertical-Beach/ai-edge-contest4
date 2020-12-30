@@ -377,12 +377,12 @@ namespace {
         struct stat s;
         lstat(path.c_str(), &s);
         if (!S_ISDIR(s.st_mode)) {
-            throw std::runtime_error("Error: " + path + " is not a valid directory!\n");
+            throw std::runtime_error("[ERROR] " + path + " is not a valid directory!");
         }
 
         DIR *dir = opendir(path.c_str());
         if (dir == nullptr) {
-            throw std::runtime_error("Error: Open " + path + " path failed.\n");
+            throw std::runtime_error("[ERROR] Open " + path + " path failed.");
         }
 
         struct dirent *entry;
