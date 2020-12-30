@@ -270,8 +270,6 @@ namespace {
             const auto elapsed_time_ms1 = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / (double)1e3;
             {
                 std::lock_guard<std::mutex> lock_cout(cout_guard);
-                std::cout << "[DEBUG] (PREPROCESS) preproc_fifo.neverReadNextElement() : " << preproc_fifo.neverReadNextElement() << std::endl;
-                std::cout << "[DEBUG] (PREPROCESS) postproc_fifo.neverReadNextElement() : " << postproc_fifo.neverReadNextElement() << std::endl;
                 std::cout << "[DEBUG] (PREPROCESS) Elapsed time of cv::resize    : " << elapsed_time_ms0 << " ms" << std::endl;
                 std::cout << "[DEBUG] (PREPROCESS) Elapsed time of normalization : " << elapsed_time_ms1 << " ms" << std::endl;
             }
@@ -317,8 +315,6 @@ namespace {
             const auto elapsed_time_ms2 = std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() / (double)1e3;
             {
                 std::lock_guard<std::mutex> lock_cout(cout_guard);
-                std::cout << "[DEBUG] (INFERENCE) preproc_fifo.neverReadNextElement() : " << preproc_fifo.neverReadNextElement() << std::endl;
-                std::cout << "[DEBUG] (INFERENCE) postproc_fifo.neverReadNextElement() : " << postproc_fifo.neverReadNextElement() << std::endl;
                 std::cout << "[DEBUG] (INFERENCE) Elapsed time of memcpy from preproc FIFO : " << elapsed_time_ms0 << " ms" << std::endl;
                 std::cout << "[DEBUG] (INFERENCE) Elapsed time of inference by DPU         : " << elapsed_time_ms1 << " ms" << std::endl;
                 std::cout << "[DEBUG] (INFERENCE) Elapsed time of memcpy to postproce FIFO : " << elapsed_time_ms2 << " ms" << std::endl;
@@ -362,8 +358,6 @@ namespace {
             const auto elapsed_time_ms1 = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / (double)1e3;
             {
                 std::lock_guard<std::mutex> lock_cout(cout_guard);
-                std::cout << "[DEBUG] (POSTPROCESS) preproc_fifo.neverReadNextElement() : " << preproc_fifo.neverReadNextElement() << std::endl;
-                std::cout << "[DEBUG] (POSTPROCESS) postproc_fifo.neverReadNextElement() : " << postproc_fifo.neverReadNextElement() << std::endl;
                 std::cout << "[DEBUG] (POSTPROCESS) Elapsed time of softmax    : " << elapsed_time_ms0 << " ms" << std::endl;
                 std::cout << "[DEBUG] (POSTPROCESS) Elapsed time of cv::resize : " << elapsed_time_ms1 << " ms" << std::endl;
             }
