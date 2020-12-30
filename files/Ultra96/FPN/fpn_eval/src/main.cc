@@ -364,6 +364,9 @@ namespace {
 #endif
             /***** END *****/
         }
+        if (!postproc_fifo.neverReadNextElement()) {
+            throw std::runtime_error("[ERROR] The data is still in the postproc FIFO.");
+        }
     }
 
     std::vector<std::string> load_img_names(const std::string& path) {
