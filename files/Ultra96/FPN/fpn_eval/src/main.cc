@@ -504,6 +504,14 @@ int main() {
                 std::rethrow_exception(ep);
             }
 
+            for (size_t im_i = 0; im_i < buffer_size; im_i++) {
+                std::string out_filepath = SEG_OUT_PATH + img_names[idx_offset + im_i];
+                out_filepath  = out_filepath.substr(0, out_filepath.find_last_of("."));
+                out_filepath += ".png";
+                cv::imwrite(out_filepath, write_buffer[im_i]);
+                std::cout << "[INFO] Store : " << out_filepath << std::endl;
+            }
+
             if constexpr (!DEBUG_MODE) {
                 elapsed_time_ms += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / (double)1e3;
                 std::cout << "[INFO] Average elapsed time of inference for the 1th to "
@@ -513,14 +521,6 @@ int main() {
                           << " ms"
                           << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-
-            for (size_t im_i = 0; im_i < buffer_size; im_i++) {
-                std::string out_filepath = SEG_OUT_PATH + img_names[idx_offset + im_i];
-                out_filepath  = out_filepath.substr(0, out_filepath.find_last_of("."));
-                out_filepath += ".png";
-                cv::imwrite(out_filepath, write_buffer[im_i]);
-                std::cout << "[INFO] Store : " << out_filepath << std::endl;
             }
         }
 
