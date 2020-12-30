@@ -328,20 +328,18 @@ namespace {
         cv::Mat seg(dpu_inout_info.out_size, CV_8UC1);
 
         auto img_dst = write_buffer.begin();
+        const auto area = seg.size().area();
         while (img_dst != write_buffer.end()) {
             /***** POSTPROCESS OF INFERENCE *****/
 #if DEBUG_MODE
             const auto t0 = std::chrono::system_clock::now();
 #endif
 
-            postproc_fifo.read(no_abnormality, [&](const PostprocFIFOElementType& dst) -> void {
-                auto offset = dst.data();
-                for (int ri = 0; ri < seg.rows; ri++) {
-                    for (int ci = 0; ci < seg.cols; ci++) {
-                        const auto max_idx = std::max_element(offset, offset + DPU_OUTPUT_NOF_CLASS);
-                        seg.at<uint8_t>(ri, ci) = static_cast<uint8_t>(std::distance(offset, max_idx));
-                        offset += DPU_OUTPUT_NOF_CLASS;
-                    }
+            postproc_fifo.read(no_abnormality, [&](const PostprocFIFOElementType& src) -> void {
+                auto offset = src.data();
+                for (int seg_i = 0; seg_i < area; seg_i++) {
+                    seg.data[seg_i] = static_cast<uint8_t>(std::distance(offset, std::max_element(offset, offset + DPU_OUTPUT_NOF_CLASS)));
+                    offset += DPU_OUTPUT_NOF_CLASS;
                 }
             });
 
