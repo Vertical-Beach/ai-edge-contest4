@@ -50,14 +50,14 @@ Vitis-AIのDPUライブラリの関数dpuProcessNormalizionによって各画素
 我々のマルチスレッド実装では，前処理，推論処理，後処理をそれぞれ別スレッド(Thread1, Thread2, Thread3)で実行する．
 スレッドセーフなFIFOクラスを実装し，
 これを用いてスレッド間でデータを受け渡す実装を行った．
-前処理を行うスレッドで処理したデータを推論処理を行うスレッドに渡すpreproc FIFOと，
-推論処理を行うスレッドで得られた結果を後処理を行うスレッドに渡すpostproc FIFOの2つを用いる．
+前処理を行うスレッドで処理した入力をDPUによる推論処理を行うスレッドに渡すpreproc FIFOと，
+DPUによる推論処理を行うスレッドで得られた出力を後処理を行うスレッドに渡すpostproc FIFOの2つを用いる．
 また，マルチスレッド実装では1枚ずつ推論を行うのではなく，複数枚の画像のバッチ処理を行う．
 ここでは一度のバッチ処理に使用する入力画像の枚数を $N$ とする．
-このような実装により，前処理，推論処理，後処理がソフトウェア的にパイプライン処理され，
+このような実装により，前処理，推論処理，後処理が擬似的にパイプライン実行され，
 実行速度の向上が期待される．
 
-図 \ref{fig:sequence} にマルチスレッド実装における処理のシーケンス図を示す．
+図 \ref{fig:sequence} にマルチスレッド実装の処理のシーケンス図を示す．
 
 \begin{figure}[h]
   \begin{center}
@@ -67,12 +67,50 @@ Vitis-AIのDPUライブラリの関数dpuProcessNormalizionによって各画素
   \end{center}
 \end{figure}
 
-この図では， $N$ 枚の画像をメモリ上に読み込み，推論を行った後に結果をファイル出力するまでの期間を示している．
+$N$ 枚の画像をメモリ上に読み込み，推論を行った後に結果をファイル出力するまでの処理のシーケンスを示している．
+3つのスレッドが生成される時刻を $t_0$ ，3つのスレッドの全てが終了する時刻を $t_1$ とするとき，
+本コンテストにおいて評価対象となる画像1枚あたりの推論処理時間 $t_{\mathrm{inference}}$ は式 \ref{equ:inference} のように計算される．
+
+\begin{equation}
+  \label{equ:inference}
+  t_{\mathrm{inference}} = \frac{t_1 - t_0}{N}
+\end{equation}
+
+ここで，シングルスレッド処理における前処理の縮小の処理時間を $t_{\mathrm{pre\_resize}}$ ，
+正規化の処理時間を $t_{\mathrm{pre\_normalize}}$ ，
+DPUによる推論の実行時間を $t_{\mathrm{dpu}}$ ，
+後処理のラベル付けの処理時間を $t_{\mathrm{post\_labeling}}$ ，
+拡大の処理時間を $t_{\mathrm{post\_resize}}$ とする．
+また，
+preproc FIFOからデータを取得する処理の処理時間を $t_{\mathrm{pop}}$ ，
+postproc FIFOにデータを入れる処理の処理時間を $t_{\mathrm{push}}$ とする．
+このとき，画像1枚あたりの推論処理時間の予測値 $t_{\mathrm{inference}}^*$ は式 \ref{equ:inference-pred} ように表される．
+
+\begin{equation}
+  \label{equ:inference-pred}
+    t_{\mathrm{inference}}^* = \frac{t_{\mathrm{max}}}{N} + t_{\mathrm{pre}} + t_{\mathrm{post}} + t_\alpha \\
+\end{equation}
+\begin{equation*}
+    \begin{split}
+      \text{where} \quad t_{\mathrm{max}} &= \max \{t_{\mathrm{pre}}, t_{\mathrm{pop}} + t_{\mathrm{dpu}} + t_{\mathrm{push}}, t_{\mathrm{post}}\}, \\
+      t_{\mathrm{pre}} &= t_{\mathrm{pre\_resize}} + t_{\mathrm{pre\_normalize}}, \\
+      t_{\mathrm{post}} &= t_{\mathrm{post\_labeling}} + t_{\mathrm{post\_resize}}
+    \end{split}
+\end{equation*}
+
+ここで， $t_\alpha$ はソフトウェア処理のマルチスレッド化による処理時間のオーバーヘッドを表している．
+我々の実装において，画像1枚あたりの推論処理時間は，前処理，DPUによる推論処理，後処理のいずれかの処理時間に律速することが分かる．
+
+次に，前処理，DPUによる推論処理，後処理のそれぞれの具体的な実装を説明する．
+ここで示すソースコードは説明のためにいずれも変数名や実装の簡略化等を行っている．
+実際のソースコードは後日公開予定のリポジトリ\footnote{https://github.com/Vertical-Beach/ai-edge-contest4}を参照されたい．
 
 \subsubsection{前処理}
+前述の通り，前処理では，cv::resizeを用いて入力画像の縮小を行い(Listing \ref{code:preproc}, Line 6)，
+Vitis-AIのDPUライブラリの関数dpuProcessNormalizionによって各画素値の正規化を行う(Listing \ref{code:preproc}, Line 8-10)．
 
 \setcounter{lstnumber}{1}
-\begin{lstlisting}[language=c++,firstnumber=last,caption=do\_preprocess(),label=code:preproc,float,floatplacement=H]
+\begin{lstlisting}[language=c++,firstnumber=last,caption=do\_preprocess(),label=code:preproc]
 void do_preprocess() {
   cv::Mat in(in_size, CV_8UC3);
   auto r_buf = read_buffer.begin();
@@ -88,10 +126,19 @@ void do_preprocess() {
 }
 \end{lstlisting}
 
-\subsubsection{推論処理}
+我々が実装したFIFOクラスはread/writeの処理をlambda式で記述するようになっている．
+これは，mutexを持つFIFOのバッファを直接参照する記述をクラス定義のスコープ外で行うためである．
+このようにすることでFIFO操作の処理を簡潔に記述することが出来る．
+FIFOクラスの実装は本レポートの最後に付録として添付している(Listing \ref{code:muitithreadfifo}, Line 16-127)．
+
+\subsubsection{DPUによる推論処理}
+DPUによる推論処理では，
+preproc FIFOからDPUの入力バッファにデータをコピーし(Listing \ref{code:inference}, Line 7)，
+関数dpuRunTaskの実行による推論後(Listing \ref{code:inference}, Line 9)，
+DPUの出力バッファからpostproc FIFOに結果をコピーする(Listing \ref{code:inference}, Line 12)．
 
 \setcounter{lstnumber}{1}
-\begin{lstlisting}[language=c++,firstnumber=last,caption=do\_inference(),label=code:inference,float,floatplacement=H]
+\begin{lstlisting}[language=c++,firstnumber=last,caption=do\_inference(),label=code:inference]
 void do_inference() {
   constexpr auto in_size  = sizeof(int8_t) * IN_IMG_W * IN_IMG_H * IN_IMG_C;
   constexpr auto out_size = sizeof(int8_t) * OUT_IMG_W * OUT_IMG_H * NOF_CLASS;
@@ -110,13 +157,15 @@ void do_inference() {
 \end{lstlisting}
 
 \subsubsection{後処理}
+後処理では，推論結果を参照してラベル画像を生成し(Listing \ref{code:postproc}, Line 6-13)，
+その後，関数cv::resizeを用いてラベル画像の拡大を行う(Listing \ref{code:postproc}, Line 15)．
 
 \setcounter{lstnumber}{1}
-\begin{lstlisting}[language=c++,firstnumber=last,caption=do\_postprocess(),label=code:postproc,float,floatplacement=H]
+\begin{lstlisting}[language=c++,firstnumber=last,caption=do\_postprocess(),label=code:postproc]
 void do_postprocess() {
   cv::Mat out(out_size, CV_8UC1);
   auto w_buf = write_buffer.begin();
-  while (postproc_fifo.neverReadNextElement()) {
+  while (w_buf != write_buffer.end()) {
     postproc_fifo.read(ok, [&](const PostprocFIFOElementType& dst) -> void {
       auto offset = dst.data();
       for (int ri = 0; ri < out.rows; ri++) {
@@ -130,5 +179,12 @@ void do_postprocess() {
     cv::resize(out, *w_buf, (*w_buf).size(), 0, 0, cv::INTER_NEAREST);
     w_buf++;
   }
+  if (!postproc_fifo.neverReadNextElement()) {
+    throw std::runtime_error("[ERROR] The data is still in the postproc FIFO.");
+  }
 }
 \end{lstlisting}
+
+ここで，本推論アプリケーションの最終的な出力となる 1216x1936 のラベル画像は，
+各ピクセルに0から5の値が格納されたグレイスケール画像であることに注意されたい．
+この0から5の値は順に「乗用車」，「歩行者」，「信号」，「車道・駐車場」，「その他」に相当する．
