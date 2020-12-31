@@ -215,13 +215,13 @@ namespace {
     constexpr auto PREPROC_FIFO_DEPTH     = 3U;
     constexpr auto POSTPROC_FIFO_DEPTH    = 3U;
     constexpr auto SLEEP_T_US             = 100U;
-    constexpr auto DPU_INPUT_IMG_WIDTH    = 960U;
-    constexpr auto DPU_INPUT_IMG_HEIGHT   = 480U;
+    constexpr auto DPU_INPUT_IMG_WIDTH    = 640U;
+    constexpr auto DPU_INPUT_IMG_HEIGHT   = 320U;
     constexpr auto DPU_INPUT_IMG_CHANNEL  = 3U;
     constexpr auto DPU_INPUT_IMG_SCALE    = 1.0f;
     constexpr auto DPU_INPUT_IMG_MEAN     = {104.0f, 117.0f, 123.0f};
-    constexpr auto DPU_OUTPUT_IMG_WIDTH   = 960U;
-    constexpr auto DPU_OUTPUT_IMG_HEIGHT  = 480U;
+    constexpr auto DPU_OUTPUT_IMG_WIDTH   = 640U;
+    constexpr auto DPU_OUTPUT_IMG_HEIGHT  = 320U;
     constexpr auto DPU_OUTPUT_NOF_CLASS   = 5U;
 
     using PreprocFIFOElementType  = std::array<int8_t, DPU_INPUT_IMG_WIDTH * DPU_INPUT_IMG_HEIGHT * DPU_INPUT_IMG_CHANNEL>;
