@@ -243,20 +243,23 @@ namespace {
 
     void do_preprocess() {
         cv::Mat resized_img(dpu_inout_info.in_size, CV_8UC3);
-        for (size_t im_i = 0; im_i < read_buffer.size(); im_i++) {
+        auto img_src = read_buffer.begin();
+        auto end_flag = false;
+        while(!end_flag) {
             /***** PREPROCESS FOR INFERENCE *****/
 #if DEBUG_MODE
             const auto t0 = std::chrono::system_clock::now();
 #endif
 
-            cv::resize(read_buffer[im_i], resized_img, resized_img.size(), 0, 0, cv::INTER_LINEAR);
+            cv::resize(*img_src, resized_img, resized_img.size(), 0, 0, cv::INTER_LINEAR);
+            img_src++;
 
 #if DEBUG_MODE
             const auto t1 = std::chrono::system_clock::now();
 #endif
 
-            const auto is_last = (bool)(im_i == read_buffer.size() - 1);
-            preproc_fifo.write(no_abnormality, is_last, [&](PreprocFIFOElementType& dst) -> void {
+            end_flag = static_cast<bool>(img_src == read_buffer.end());
+            preproc_fifo.write(no_abnormality, end_flag, [&](PreprocFIFOElementType& dst) -> void {
                 dpuProcessNormalizion(dst.data(), resized_img.data, resized_img.rows, resized_img.cols, dpu_inout_info.in_mean,
                                       dpu_inout_info.in_scale_fix, resized_img.step1());
             });
@@ -267,8 +270,6 @@ namespace {
             const auto elapsed_time_ms1 = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / (double)1e3;
             {
                 std::lock_guard<std::mutex> lock_cout(cout_guard);
-                std::cout << "[DEBUG] (PREPROCESS) preproc_fifo.neverReadNextElement() : " << preproc_fifo.neverReadNextElement() << std::endl;
-                std::cout << "[DEBUG] (PREPROCESS) postproc_fifo.neverReadNextElement() : " << postproc_fifo.neverReadNextElement() << std::endl;
                 std::cout << "[DEBUG] (PREPROCESS) Elapsed time of cv::resize    : " << elapsed_time_ms0 << " ms" << std::endl;
                 std::cout << "[DEBUG] (PREPROCESS) Elapsed time of normalization : " << elapsed_time_ms1 << " ms" << std::endl;
             }
@@ -314,8 +315,6 @@ namespace {
             const auto elapsed_time_ms2 = std::chrono::duration_cast<std::chrono::microseconds>(t3 - t2).count() / (double)1e3;
             {
                 std::lock_guard<std::mutex> lock_cout(cout_guard);
-                std::cout << "[DEBUG] (INFERENCE) preproc_fifo.neverReadNextElement() : " << preproc_fifo.neverReadNextElement() << std::endl;
-                std::cout << "[DEBUG] (INFERENCE) postproc_fifo.neverReadNextElement() : " << postproc_fifo.neverReadNextElement() << std::endl;
                 std::cout << "[DEBUG] (INFERENCE) Elapsed time of memcpy from preproc FIFO : " << elapsed_time_ms0 << " ms" << std::endl;
                 std::cout << "[DEBUG] (INFERENCE) Elapsed time of inference by DPU         : " << elapsed_time_ms1 << " ms" << std::endl;
                 std::cout << "[DEBUG] (INFERENCE) Elapsed time of memcpy to postproce FIFO : " << elapsed_time_ms2 << " ms" << std::endl;
@@ -328,21 +327,19 @@ namespace {
     void do_postprocess() {
         cv::Mat seg(dpu_inout_info.out_size, CV_8UC1);
 
-        auto im_i = 0U;
-        auto end_flag = false;
-        while (!end_flag) {
+        auto img_dst = write_buffer.begin();
+        const auto area = seg.size().area();
+        while (img_dst != write_buffer.end()) {
             /***** POSTPROCESS OF INFERENCE *****/
 #if DEBUG_MODE
             const auto t0 = std::chrono::system_clock::now();
 #endif
 
-            postproc_fifo.read(no_abnormality, [&](const PostprocFIFOElementType& dst) -> void {
-                for (int ri = 0; ri < seg.rows; ri++) {
-                    for (int ci = 0; ci < seg.cols; ci++) {
-                        const auto idx = (ri * seg.cols + ci) * DPU_OUTPUT_NOF_CLASS;
-                        const auto max_idx = std::max_element(dst.data() + idx, dst.data() + idx + DPU_OUTPUT_NOF_CLASS);
-                        seg.at<unsigned char>(ri, ci) = (unsigned char)(std::distance(dst.data() + idx, max_idx));
-                    }
+            postproc_fifo.read(no_abnormality, [&](const PostprocFIFOElementType& src) -> void {
+                auto offset = src.data();
+                for (int seg_i = 0; seg_i < area; seg_i++) {
+                    seg.data[seg_i] = static_cast<uint8_t>(std::distance(offset, std::max_element(offset, offset + DPU_OUTPUT_NOF_CLASS)));
+                    offset += DPU_OUTPUT_NOF_CLASS;
                 }
             });
 
@@ -350,7 +347,8 @@ namespace {
             const auto t1 = std::chrono::system_clock::now();
 #endif
 
-            cv::resize(seg, write_buffer[im_i], write_buffer[im_i].size(), 0, 0, cv::INTER_NEAREST);
+            cv::resize(seg, *img_dst, (*img_dst).size(), 0, 0, cv::INTER_NEAREST);
+            img_dst++;
 
 #if DEBUG_MODE
             const auto t2 = std::chrono::system_clock::now();
@@ -358,16 +356,14 @@ namespace {
             const auto elapsed_time_ms1 = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() / (double)1e3;
             {
                 std::lock_guard<std::mutex> lock_cout(cout_guard);
-                std::cout << "[DEBUG] (POSTPROCESS) preproc_fifo.neverReadNextElement() : " << preproc_fifo.neverReadNextElement() << std::endl;
-                std::cout << "[DEBUG] (POSTPROCESS) postproc_fifo.neverReadNextElement() : " << postproc_fifo.neverReadNextElement() << std::endl;
                 std::cout << "[DEBUG] (POSTPROCESS) Elapsed time of softmax    : " << elapsed_time_ms0 << " ms" << std::endl;
                 std::cout << "[DEBUG] (POSTPROCESS) Elapsed time of cv::resize : " << elapsed_time_ms1 << " ms" << std::endl;
             }
 #endif
             /***** END *****/
-
-            end_flag = postproc_fifo.neverReadNextElement();
-            im_i++;
+        }
+        if (!postproc_fifo.neverReadNextElement()) {
+            throw std::runtime_error("[ERROR] The data is still in the postproc FIFO.");
         }
     }
 
@@ -379,12 +375,12 @@ namespace {
         struct stat s;
         lstat(path.c_str(), &s);
         if (!S_ISDIR(s.st_mode)) {
-            throw std::runtime_error("Error: " + path + " is not a valid directory!\n");
+            throw std::runtime_error("[ERROR] " + path + " is not a valid directory!");
         }
 
         DIR *dir = opendir(path.c_str());
         if (dir == nullptr) {
-            throw std::runtime_error("Error: Open " + path + " path failed.\n");
+            throw std::runtime_error("[ERROR] Open " + path + " path failed.");
         }
 
         struct dirent *entry;
@@ -503,6 +499,14 @@ int main() {
                 std::rethrow_exception(ep);
             }
 
+            for (size_t im_i = 0; im_i < buffer_size; im_i++) {
+                std::string out_filepath = SEG_OUT_PATH + img_names[idx_offset + im_i];
+                out_filepath  = out_filepath.substr(0, out_filepath.find_last_of("."));
+                out_filepath += ".png";
+                cv::imwrite(out_filepath, write_buffer[im_i]);
+                std::cout << "[INFO] Store : " << out_filepath << std::endl;
+            }
+
             if constexpr (!DEBUG_MODE) {
                 elapsed_time_ms += std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / (double)1e3;
                 std::cout << "[INFO] Average elapsed time of inference for the 1th to "
@@ -512,14 +516,6 @@ int main() {
                           << " ms"
                           << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-
-            for (size_t im_i = 0; im_i < buffer_size; im_i++) {
-                std::string out_filepath = SEG_OUT_PATH + img_names[idx_offset + im_i];
-                out_filepath  = out_filepath.substr(0, out_filepath.find_last_of("."));
-                out_filepath += ".png";
-                cv::imwrite(out_filepath, write_buffer[im_i]);
-                std::cout << "[INFO] Store : " << out_filepath << std::endl;
             }
         }
 
