@@ -88,7 +88,7 @@ postproc FIFOにデータを入れる処理の処理時間を $t_{\mathrm{push}}
 
 \begin{equation}
   \label{equ:inference-pred}
-    t_{\mathrm{inference}}^* = \frac{t_{\mathrm{max}}}{N} + t_{\mathrm{pre}} + t_{\mathrm{post}} + t_\alpha \\
+    t_{\mathrm{inference}}^* = t_{\mathrm{max}} + \frac{t_{\mathrm{pre}} + t_{\mathrm{post}}}{N} + t_\alpha \\
 \end{equation}
 \begin{equation*}
     \begin{split}
