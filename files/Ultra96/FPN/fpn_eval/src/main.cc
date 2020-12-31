@@ -211,7 +211,7 @@ namespace {
     const std::string CONV_INPUT_NODE   = "conv1_7x7_s2";
     const std::string CONV_OUTPUT_NODE  = "toplayer_p2";
 
-    constexpr auto BATCH_SIZE             = 30U;
+    constexpr auto BATCH_SIZE             = 130U;
     constexpr auto PREPROC_FIFO_DEPTH     = 3U;
     constexpr auto POSTPROC_FIFO_DEPTH    = 3U;
     constexpr auto SLEEP_T_US             = 100U;
