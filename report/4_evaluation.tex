@@ -1,44 +1,76 @@
 \section{性能評価}
 コンテストから提供されるテスト画像649枚に対してUltra96-V2ボード上で推論を実行した．
 実行時間の評価における設定項目は以下の通りである．
-\begin{itemize}
-    \item{DPU:B2304@200/400MHz}
-    \item{推論画像サイズ：320*640}
-    \item{BATCH\_SIZE：130}
-\end{itemize}
+\begin{description}
+  \item[DPU:] B2304@200/400MHz
+  \item[推論画像サイズ:] 320*640
+  \item[$N$ (一度に処理する画像の数):] 130
+\end{description}
 \subsection{実行時間}
-シングルスレッド実装において，前処理，推論処理，後処理はそれぞれ11.857ms，54.823ms，18.445msであった．
-マルチスレッド実装における前処理〜推論処理〜後処理の平均時間は57.928msであった．
-マルチスレッド実装によって1枚あたりの平均処理時間が大幅に短縮されていることが確認できた．
+テスト用画像 649 枚に対する推論処理時間の平均を計測した．
+はじめにシングルスレッド実行における詳細な処理時間を表 \ref{tbl:time-singlethread} に示す．
+
+\begin{table}[h]
+  \caption{シングルスレッド実行における平均処理時間} \vspace{1mm}
+  \label{tbl:time-singlethread}
+  \begin{center}
+    \begin{tabular}{cc}
+      name & elapsed time (ms) \\ \hline
+      $t_{\mathrm{pre\_resize}}$    & 9.36 \\ \hline
+      $t_{\mathrm{pre\_normalize}}$ & 1.98 \\ \hline
+      $t_{\mathrm{pop}}$            & 0.63 \\ \hline
+      $t_{\mathrm{dpu}}$            & 54.1 \\ \hline
+      $t_{\mathrm{push}}$           & 1.09 \\ \hline
+      $t_{\mathrm{post\_labeling}}$ & 6.93 \\ \hline
+      $t_{\mathrm{post\_resize}}$   & 5.25 \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+シングルスレッド実行では，
+前処理の処理時間($t_{\mathrm{pre\_resize}} + t_{\mathrm{pre\_normalize}}$)は11.334ms，
+DPUによるによる推論の処理時間($t_{\mathrm{dpu}}$)は54.134ms，
+後処理の処理時間($t_{\mathrm{post\_labeling}} + t_{\mathrm{post\_resize}}$)は12.183msであった．
+すなわち，シングルスレッド実装の推論処理時間の平均は77.651msであることが分かる。
+
+マルチスレッド実装では，
+推論処理時間の平均($t_{\mathrm{inference}}$)が57.928msとなった．
+処理のマルチスレッド化により約25\%の高速化を達成したことが分かる．
+ここで，マルチスレッド化によるオーバーヘッド $t_\alpha$ は1.93msであった．
+この値は理想的なパイプライン処理との処理時間の差を示す．
 
 \subsection{実行結果}
-図\ref{estimate_result}に入力画像と推論結果，および推論結果を入力画像に合成したものの1例を示す．
-\begin{figure}[b]
+
+図 \ref{estimate_result} に入力画像と推論結果，および推論結果を入力画像に合成したものの1例を示す．
+
+\begin{figure}[h]
+  \begin{center}
     \label{estimate_result}
     \caption{推論結果}
-    \begin{minipage}{0.33\hsize}
-     \begin{center}
-      \includegraphics[width=60mm]{./figures/orig.jpg}
-     \end{center}
+    \begin{minipage}{0.32\hsize}
+      \begin{center}
+        \includegraphics[width=\linewidth]{./figures/orig.jpg}
+      \end{center}
     \end{minipage}
-    \begin{minipage}{0.33\hsize}
-     \begin{center}
-      \includegraphics[width=60mm]{./figures/label.png}
-     \end{center}
+    \begin{minipage}{0.32\hsize}
+      \begin{center}
+        \includegraphics[width=\linewidth]{./figures/label.png}
+      \end{center}
     \end{minipage}
-    \begin{minipage}{0.33\hsize}
-        \begin{center}
-         \includegraphics[width=60mm]{./figures/mixed.png}
-        \end{center}
-       \end{minipage}   
-   \end{figure}
+    \begin{minipage}{0.32\hsize}
+      \begin{center}
+        \includegraphics[width=\linewidth]{./figures/mixed.png}
+      \end{center}
+    \end{minipage}
+  \end{center}
+\end{figure}
 推論結果をSIGNATEに投稿した結果，mIoUスコアは0.6014857となった．
 
 \subsection{リソース使用率}
 B2304 DPUを第3章で説明したとおりのコンフィグレーションで実装した場合のDPUおよび回路全体のリソース使用率を表\ref{resource_util}に示す．
 DPU IPを含んだVivadoプロジェクトをVitisが自動生成する際にベースとするプラットフォームプロジェクトにAXI GPIOやUARTなどのIPが含まれているため，今回のコンテストにおいては不要なIPも含まれている．
 
-\begin{table}[b]
+\begin{table}[h]
     \begin{center}
         \label{resource_util}
         \caption{リソース使用率}
