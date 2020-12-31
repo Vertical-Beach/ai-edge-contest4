@@ -8,10 +8,10 @@
 \end{description}
 \subsection{実行時間}
 テスト用画像 649 枚に対する推論処理時間の平均を計測した．
-はじめにシングルスレッド実行における詳細な処理時間を表 \ref{tbl:time-singlethread} に示す．
+はじめにシングルスレッド実装における詳細な処理時間を表 \ref{tbl:time-singlethread} に示す．
 
 \begin{table}[h]
-  \caption{シングルスレッド実行における平均処理時間} \vspace{1mm}
+  \caption{シングルスレッド実装における平均処理時間} \vspace{1mm}
   \label{tbl:time-singlethread}
   \begin{center}
     \begin{tabular}{cc}
@@ -27,7 +27,7 @@
   \end{center}
 \end{table}
 
-シングルスレッド実行では，
+シングルスレッド実装では，
 前処理の処理時間($t_{\mathrm{pre\_resize}} + t_{\mathrm{pre\_normalize}}$)は11.334ms，
 DPUによるによる推論の処理時間($t_{\mathrm{dpu}}$)は54.134ms，
 後処理の処理時間($t_{\mathrm{post\_labeling}} + t_{\mathrm{post\_resize}}$)は12.183msであった．
