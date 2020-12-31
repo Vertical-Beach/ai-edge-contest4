@@ -13,8 +13,26 @@
 
 \subsection{実行結果}
 図\ref{estimate_result}に入力画像と推論結果，および推論結果を入力画像に合成したものの1例を示す．
-
-推論結果をSINGATEに投稿した結果，mIoUスコアは0.6014857となった．
+\begin{figure}[b]
+    \label{estimate_result}
+    \caption{推論結果}
+    \begin{minipage}{0.33\hsize}
+     \begin{center}
+      \includegraphics[width=60mm]{./figures/orig.jpg}
+     \end{center}
+    \end{minipage}
+    \begin{minipage}{0.33\hsize}
+     \begin{center}
+      \includegraphics[width=60mm]{./figures/label.png}
+     \end{center}
+    \end{minipage}
+    \begin{minipage}{0.33\hsize}
+        \begin{center}
+         \includegraphics[width=60mm]{./figures/mixed.png}
+        \end{center}
+       \end{minipage}   
+   \end{figure}
+推論結果をSIGNATEに投稿した結果，mIoUスコアは0.6014857となった．
 
 \subsection{リソース使用率}
 B2304 DPUを第3章で説明したとおりのコンフィグレーションで実装した場合のDPUおよび回路全体のリソース使用率を表\ref{resource_util}に示す．
