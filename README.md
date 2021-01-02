@@ -22,10 +22,11 @@ We labeled 'BOOT' and 'rootfs' for each partition.
 /dev/sda2        1050624 23490559 22439936  10.7G 83 Linux
 ```
 ```bash
+git clone https://github.com/Vertical-Beach/ai-edge-contest4
 cd prebuilt
 #boot image
 cp boot/* /media/<username>/rootfs/
-#petalinux rootfs
+#download petalinux rootfs.tar.gz from  https://drive.google.com/file/d/1CZCmH-_F6JzCOsH1YQWjfvzYKzBldcuu/view?usp=sharing
 sudo tar xvf rootfs.tar.gz -C /media/<username>/rootfs/
 #copy dpu image
 cp dpu.xclbin /media/<username>/rootfs/usr/lib/
@@ -36,8 +37,8 @@ sudo cp -r vitis-ai_v1.1_dnndk /media/<username>/home/root/
 #copy realtime video application
 sudo cp -r ../app/fpn_video /media/<username>/home/root/
 ```
-After you created SD image, connect USB Mouse/Keyboard and DP-HDMI adapter, and launch terminal on Ultra96-V2 board.
-You can check your DPU configuration on board. After you created SD image, connect USB Mouse/Keyboard and DP-HDMI adapter, and launch terminal on Ultra96-V2 board and install DNNDK.
+After you created SD image, connect USB Mouse/Keyboard and DP-HDMI adapter, launch terminal on Ultra96-V2 board, and install Vitis-AI DNNDK.  
+You can check your DPU configuration on board.
 ```bash
 cd vitis-ai_v1.1_dnndk
 source ./install.sh 
@@ -92,7 +93,10 @@ python caffe_extract_to_numpy.py -i deploy.prototxt -w pretrained.caffemodel -o 
 ``` 
 ### Export numpy array to pytorch and perform training
 Next, setup pytorch training environment. We use [deepo](https://github.com/ufoym/deepo) for setup pytorch environment.  
-You had better mount your Vitis-AI directory on deepo environment to share files between docker containers.  
+You had better mount your Vitis-AI directory on deepo environment to share files between docker containers.
+```bash
+docker run --gpus all -v <path to Vitis-AI>/:/workspace -it  ufoym/deepo bin/bash
+```
 Export pretrained weight from numpy array to pytorch(.pth)
 ```bash
 cd training
