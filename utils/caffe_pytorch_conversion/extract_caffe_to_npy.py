@@ -38,8 +38,8 @@ def extract_caffe_model(model, weights, output_path):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument("--model", help="model prototxt path .prototxt")
-  parser.add_argument("--weights", help="caffe model weights path .caffemodel")
-  parser.add_argument("--output", help="output path")
+  parser.add_argument("-m", "--model", help="model prototxt path .prototxt")
+  parser.add_argument("-w", "--weights", help="caffe model weights path .caffemodel")
+  parser.add_argument("-o", "--output", help="output path")
   args = parser.parse_args()
   extract_caffe_model(args.model, args.weights, args.output)
