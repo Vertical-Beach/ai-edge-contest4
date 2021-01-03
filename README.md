@@ -133,8 +133,7 @@ You can also train on your custom dataset by modifying `/training/datasets.py` a
 python train.py
 ```
 While training, the loss curve graph is updated for every epoch and generated to `/training/training_logs/<model_id>/loss_curve.png` like:  
-<!-- ここにlosscurveをはる -->
-![Loss Curve](https://github.com/lp6m/aiedge_contest4/blob/prepare_publish/training/training_logs/bdd100k/loss_curve.png?raw=true "loss curve")
+<img src="https://github.com/Vertical-Beach/ai-edge-contest4/blob/media/media/loss_curve.png?raw=true" width="500">
 
 ## Evaluate trained model on pytorch
 set `DATASET_MODE=BDD100K` and `mode=TEST` in `training/evaluation/eval_on_val.py` for test.  
@@ -173,8 +172,10 @@ cd files/Segment/workspace/scripts/test_scripts
 sh test_fpn.sh
 ```
 Output is slightly different between pytorch and caffe.
-<!-- Caffeとpytorchの結果比較 -->
-<!-- `val/overlayed/932a0bc8-753b2c12.png` -->
+
+|  Pytorch  |  Caffe  |
+| ---- | ---- |
+|  <img src="https://github.com/Vertical-Beach/ai-edge-contest4/blob/media/media/pytorch_prediction.png?raw=true" width="300">  |  <img src="https://github.com/Vertical-Beach/ai-edge-contest4/blob/media/media/caffe_prediction.png?raw=true" width="300">  |
 
 # Setup Vitis-AI platform on Ultra96-V2
 English instruction is here : [Vitis-AI 1.1 Flow for Avnet VITIS Platforms - Part 1](https://www.hackster.io/AlbertaBeef/vitis-ai-1-1-flow-for-avnet-vitis-platforms-part-1-007b0e)  
@@ -221,7 +222,23 @@ After you created SD image, connect USB Mouse/Keyboard and DP-HDMI adapter, and 
 You can check your DPU configuration on board. 
 ```bash
 $dexplorer -w
-# ここにdexplorerの出力を貼る
+[DPU IP Spec]
+IP  Timestamp            : 2020-03-26 13:30:00
+DPU Core Count           : 1
+
+[DPU Core Configuration List]
+DPU Core                 : #0
+DPU Enabled              : Yes
+DPU Arch                 : B2304
+DPU Target Version       : v1.4.1
+DPU Freqency             : 300 MHz
+Ram Usage                : Low
+DepthwiseConv            : Disabled
+DepthwiseConv+Relu6      : Disabled
+Conv+Leakyrelu           : Enabled
+Conv+Relu6               : Enabled
+Channel Augmentation     : Enabled
+Average Pool             : Disabled
 ```
 I don't know why, but the clock frequency is displayed as 300MHz. But running time of DPU is faster than when implement on 150/300MHz, so we think displayed clock frequency on dexproler is not correct.  
 
@@ -353,11 +370,14 @@ make
 ```
 
 ## Evaluation for images
+Source code is in `app/fpn_eval`
 Evaluation code for images is used for competition.  
-There are three threads: preprocess, dpuprocess, postprocess.
-Multi-thread processing reduced the average processing time per image.
+ <img src="https://github.com/Vertical-Beach/ai-edge-contest4/blob/media/media/sw_opt_flowchart_multithread.png?raw=true" width="600">  
+In our multi-thread implementation, pre-processing, inference processing, and post-processing are executed in separate threads (Thread1, Thread2, Thread3). We implement a thread-safe FIFO class to pass data between threads. Preproc FIFO that passes the input processed by the thread that performs preprocessing to the thread that performs inference processing by DPU, and postproc FIFO that passes the output obtained by the thread that performs inference processing by DPU to the thread that performs postprocessing. In addition, in the multithread implementation, batch processing of multiple images is performed instead of inferring one by one. Here, the number of input images used for one batch processing is `N`. Three threads are executedin the pipeline and improve execution speed.  
+
 <!-- PDF引用 -->
 ## Realtime Video app
+Source code is in `app/fpn_video`
 Run realtime semantic segmentation for video. This application is based on `cf_fpn_cityscapes_256_512_8.9G` on [Xilinx's AI-Model-Zoo](https://github.com/Xilinx/AI-Model-Zoo). Input image size of DPU is modified to 256\*512 to 320\*640. Achieved FPS is about 15.5fps and it is slower than 27FPS described in AI-Model-Zoo.  
 Demo Video (Youtube Link):  
 [![](http://img.youtube.com/vi/0OF19EB_FHQ/0.jpg)](http://www.youtube.com/watch?v=0OF19EB_FHQ "")  
