@@ -12,7 +12,7 @@ Environments: Ubuntu18.04 and Vitis-AI v1.1
 
 # Files
 - app  
-  Evaluation applications on Ultra96/
+  Evaluation applications on Ultra96
 - data  
   put BDD100K/SIGNATE dataset here.
 - dpu_info  
@@ -25,7 +25,7 @@ Environments: Ubuntu18.04 and Vitis-AI v1.1
 - training  
     training scripts on PyTorch
 - utils
-  - weight convert scripts between pytorch and signate
+  - weight convert scripts between pytorch and Caffe
   - signate dataset util
 
 # Demo  
@@ -134,6 +134,7 @@ python train.py
 ```
 While training, the loss curve graph is updated for every epoch and generated to `/training/training_logs/<model_id>/loss_curve.png` like:  
 <!-- ここにlosscurveをはる -->
+![Loss Curve](https://github.com/lp6m/aiedge_contest4/blob/prepare_publish/training/training_logs/bdd100k/loss_curve.png?raw=true "loss curve")
 
 ## Evaluate trained model on pytorch
 set `DATASET_MODE=BDD100K` and `mode=TEST` in `training/evaluation/eval_on_val.py` for test.  
