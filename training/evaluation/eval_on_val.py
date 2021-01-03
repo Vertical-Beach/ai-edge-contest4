@@ -31,7 +31,7 @@ DATASET_MODE = BDD100K
 #choose validation or test
 VAL = 0
 TEST = 1
-mode = VAL
+mode = TEST
 dataset = None
 if mode == VAL:
     if DATASET_MODE == BDD100K:
