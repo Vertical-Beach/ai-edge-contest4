@@ -10,12 +10,12 @@ DNN model and inference code is based on [Xilinx ML-Caffe-Segmentation-Tutorial]
 Training code is based on [fregu856/deeplabv3](https://github.com/fregu856/deeplabv3).  
 Environments: Ubuntu18.04 and Vitis-AI v1.1
 
-## Files
+# Files
 - app  
   Evaluation applications on Ultra96/
 - data  
   put BDD100K/SIGNATE dataset here.
-- dpu_info
+- dpu_info  
   DPU configuration data for Vitis-AI quantizer and compiler.
 - files
   - Segment/workspace  
@@ -28,7 +28,7 @@ Environments: Ubuntu18.04 and Vitis-AI v1.1
   - weight convert scripts between pytorch and signate
   - signate dataset util
 
-## Demo  
+# Demo  
 You can test segmentation app on Ultra96-V2 board.
 Format SD image and divide SD into two partitions: first partition(512MB, FAT), second partition(extf4).
 We labeled 'BOOT' and 'rootfs' for each partition.
@@ -64,8 +64,8 @@ sh change_resolution.sh
 ./segmentation video.mp4
 ```
 
-## Training
-### Model definition
+# Training
+## Model definition
 We modified the `scale` and `mean` parameter of [FPN model of Xilinx tutorial](https://github.com/Xilinx/Vitis-AI-Tutorials/blob/ML-Caffe-Segmentation-Tutorial/files/Segment/workspace/model/FPN/train_val.prototxt#L7).
 `mean` and `scale` was modified as following. These values are equal to the model definition of segmentation sample contained in Vitis-AI Model Zoo.  
 ```diff
@@ -95,12 +95,12 @@ And also we modified the number of class of final output layer.
 >     num_output: 5
 ```
 
-### Training on pytorch
+## Training on pytorch
 On the referenced tutorial, the model training is performed on Xilinx Caffe framework and `SoftmaxWithCrossEntropy` loss functions is used. To improve the model accuracy, we used [Lovasz-Loss](https://github.com/bermanmaxim/LovaszSoftmax) function. The published `Lovasz-Loss` implementation is only for tensorflow and pytorch, and tensorflow implementation is very slow (see [issue](https://github.com/bermanmaxim/LovaszSoftmax/issues/6)). so we perform training on pytorch and export trained weight to caffe.  
 
 We did not use model converter like ONNX because converted model cannot be quantized on `Vitis-AI Quantizer`. We manually extract model weight to numpy array and export it. On this step, we exlain training on BDD100K dataset.  
 
-### Export pretrained caffe weight to numpy array
+## Export pretrained caffe weight to numpy array
 First, extract pretrained weight of Xilinx tutorial. This step is performed on the Xilinx Vitis-AI docker environment.
 ```bash
 conda activate vitis-ai-caffe
@@ -108,7 +108,7 @@ cd files/Segment/workspace/model/FPN
 python ../../../../../utils/caffe_pytorch_conversion/extract_caffe_to_npy.py -m deploy.prototxt -w final_models/pretrained.caffemodel  -o ../../../../../npy
 ``` 
 Weights of each layer are generated in `npy` directory.  
-### Export numpy array to pytorch and perform training
+## Export numpy array to pytorch and perform training
 Next, setup pytorch training environment. We use [deepo](https://github.com/ufoym/deepo) for setup pytorch environment.  
 You had better mount your Vitis-AI directory on deepo environment to share files between docker containers.
 ```bash
@@ -135,7 +135,7 @@ python train.py
 While training, the loss curve graph is updated for every epoch and generated to `/training/training_logs/<model_id>/loss_curve.png` like:  
 <!-- ここにlosscurveをはる -->
 
-### Evaluate trained model on pytorch
+## Evaluate trained model on pytorch
 set `DATASET_MODE=BDD100K` and `mode=TEST` in `training/evaluation/eval_on_val.py` for test.  
 set `mode = VAL` for validation, and set `LOSS_MODE` for validation loss value function.  
 set trained modedl path in `network.load_state_dict()`.
@@ -145,7 +145,7 @@ python eval_on_val.py
 ```
 label images are generated in `<model_id>/<test or val>/label`, and overlayed images are generated in `<model_id>/<test or val>/overlayed`.
 
-### Export pytorch weight to numpy and import to Caffe
+## Export pytorch weight to numpy and import to Caffe
 After training finished, export pytorch weight to numpy array and import to caffe.  
 ```bash
 #On pytorch envirionment
@@ -165,7 +165,7 @@ cd files/Segment/workspace/model/FPN/
 python ../../../../../utils/caffe_pytorch_conversion/convert_from_npy_to_caffe.py -m ./deploy.prototxt -i ../../../../../npy2/ -o converted.caffemodel
 ```
 
-### Evaluate trained weight on Xilinx caffe.
+## Evaluate trained weight on Xilinx caffe.
 ```bash
 conda activate vitis-ai-caffe
 cd files/Segment/workspace/scripts/test_scripts
@@ -175,7 +175,7 @@ Output is slightly different between pytorch and caffe.
 <!-- Caffeとpytorchの結果比較 -->
 <!-- `val/overlayed/932a0bc8-753b2c12.png` -->
 
-## Setup Vitis-AI platform on Ultra96-V2
+# Setup Vitis-AI platform on Ultra96-V2
 English instruction is here : [Vitis-AI 1.1 Flow for Avnet VITIS Platforms - Part 1](https://www.hackster.io/AlbertaBeef/vitis-ai-1-1-flow-for-avnet-vitis-platforms-part-1-007b0e)  
 Japanese instruction is here : [DNNDK on Vitis AI on Ultra96v2](https://qiita.com/nv-h/items/7525c9319087a3f51755#setup)  
 In this project, we modified `<DPU-TRD>/prj/Vitis/config_file/prj_config` as follows.  
@@ -328,7 +328,7 @@ kernel list info for network "segmentation"
 ```
 </details>
 
-## App
+# App
 You can use cross-compile DPU application on host machine.  
 First, setup cross compile environment. This step is peformed in host machine termianl.
 ```bash
@@ -351,20 +351,19 @@ cd app/fpn_[video or eval]
 make
 ```
 
-### Evaluation for images
+## Evaluation for images
 Evaluation code for images is used for competition.  
 There are three threads: preprocess, dpuprocess, postprocess.
 Multi-thread processing reduced the average processing time per image.
 <!-- PDF引用 -->
-### Realtime Video app
+## Realtime Video app
 Run realtime semantic segmentation for video. This application is based on `cf_fpn_cityscapes_256_512_8.9G` on [Xilinx's AI-Model-Zoo](https://github.com/Xilinx/AI-Model-Zoo). Input image size of DPU is modified to 256\*512 to 320\*640. Achieved FPS is about 15.5fps and it is slower than 27FPS described in AI-Model-Zoo.  
 Demo Video (Youtube Link):  
 [![](http://img.youtube.com/vi/0OF19EB_FHQ/0.jpg)](http://www.youtube.com/watch?v=0OF19EB_FHQ "")  
-## References
+# References
 - https://signate.jp/competitions/285
 - https://github.com/Xilinx/Vitis-AI-Tutorials/tree/ML-Caffe-Segmentation-Tutorial
 - https://github.com/fregu856/deeplabv3
 - https://github.com/bermanmaxim/LovaszSoftmax
-- 
-## Licence
+# Licence
 <!-- MIT? -->
