@@ -1,3 +1,3 @@
 python test_fpn.py --model ../../model/FPN/deploy.prototxt \
---weights ../../model/FPN/final_models/pretrained.caffemodel \
---input ../munich_000000_000019_leftImg8bit.png --out_dir ./
+--weights ../../model/FPN/converted.caffemodel \
+--input ../../../../../data/bdd100k/seg/images/val/932a0bc8-753b2c12.jpg --out_dir ./
