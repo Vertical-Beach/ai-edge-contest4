@@ -1,1 +1,1 @@
-{"target": "DPUCZDX8G", "dcf": "/workspace/Vitis-AI-Tutorials/files/Ultra96/dpu_info/B2304_custom/ULTRA96V2.dcf", "cpu_arch": "arm64"}
+{"target": "DPUCZDX8G", "dcf": "/workspace/Vitis-AI-Tutorials/dpu_info/ULTRA96V2.dcf", "cpu_arch": "arm64"}
