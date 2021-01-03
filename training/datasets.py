@@ -202,7 +202,10 @@ class DatasetTrainBDD100K(torch.utils.data.Dataset):
         return self.num_examples
 
 class DatasetValBDD100K(torch.utils.data.Dataset):
-    def __init__(self, bdd100k_data_path):
+    def __init__(self, bdd100k_data_path,  new_img_h =None, new_img_w = None, transform_flag = True):
+        self.transform_flag = transform_flag
+        self.new_img_h = new_img_h
+        self.new_img_w = new_img_w
         self.examples = []
         files = open(f"{bdd100k_data_path}/seg/val_files.txt").read().split("\n")[:-1]
         for img_id in files:
@@ -235,7 +238,11 @@ class DatasetValBDD100K(torch.utils.data.Dataset):
         label = np.where(label == 6, 2, label)
         label = np.where(label == 13, 3, label)
 
-        img, label = transform_image_and_label(img, label)
+        if self.transform_flag:
+            img, label = transform_image_and_label(img, label)
+        else:
+            img = cv2.resize(img, (self.new_img_w, self.new_img_h), interpolation=cv2.INTER_LINEAR) 
+            label = cv2.resize(label, (self.new_img_w, self.new_img_h), interpolation=cv2.INTER_NEAREST) 
         img = normalize_img(img)
 
         # convert numpy -> torch:

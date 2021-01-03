@@ -31,11 +31,11 @@ DATASET_MODE = BDD100K
 #choose validation or test
 VAL = 0
 TEST = 1
-mode = TEST
+mode = VAL
 dataset = None
 if mode == VAL:
     if DATASET_MODE == BDD100K:
-        dataset = DatasetValBDD100K(bdd100k_data_path='../../data/bdd100k')
+        dataset = DatasetValBDD100K(bdd100k_data_path='../../data/bdd100k', new_img_h = 320, new_img_w = 640, transform_flag = False)
     elif DATASET_MODE == SIGNATE:
         dataset = DatasetValSignate(signate_data_path='../../data/signate')
 else:
