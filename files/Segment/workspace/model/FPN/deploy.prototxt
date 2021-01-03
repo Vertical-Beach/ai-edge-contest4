@@ -6,8 +6,8 @@ layer {
     shape {
       dim: 1
       dim: 3
-      dim: 480
-      dim: 960
+      dim: 512
+      dim: 1024
     }
   }
 }
@@ -4038,7 +4038,7 @@ layer {
   name: "toplayer_p2"
   type: "Deconvolution"
   convolution_param {
-    num_output: 5
+    num_output: 19
     kernel_size: 4
     pad: 0
     stride: 4

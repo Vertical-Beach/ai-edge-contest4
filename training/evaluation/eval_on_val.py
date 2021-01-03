@@ -22,7 +22,7 @@ model_id = "bdd100k"
 from fpn_resnet18 import FPNResnet18
 network = FPNResnet18().cuda()
 # network.load_state_dict(torch.load(f"../training_logs/{model_id}/checkpoints/model_signate_epoch_1262.pth"))
-network.load_state_dict(torch.load(f"../training_logs/{model_id}/checkpoints/model_bdd100k_epoch_33.pth"))
+network.load_state_dict(torch.load(f"../training_logs/{model_id}/checkpoints/model_bdd100k_epoch_334.pth"))
 
 #choose dataset
 SIGNATE = 0
