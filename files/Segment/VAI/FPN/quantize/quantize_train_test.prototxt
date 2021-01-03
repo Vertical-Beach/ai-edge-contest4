@@ -19,12 +19,12 @@ layer {
     }
   }
   image_data_param {
-    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_test_calibration.txt"
+    source: "/workspace/Vitis-AI-Tutorials/data/bdd100k/seg/calib_files.txt"
     batch_size: 1
     shuffle: true
     new_height: 320
     new_width: 640
-    root_folder: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_test_images/"
+    root_folder: "/workspace/Vitis-AI-Tutorials/data/bdd100k/seg/images/train/"
   }
 }
 layer {

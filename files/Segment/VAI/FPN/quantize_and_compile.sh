@@ -26,4 +26,4 @@ vai_c_caffe   --prototxt=${model_dir}/deploy.prototxt \
         --caffemodel=${model_dir}/deploy.caffemodel \
         --output_dir=${output_dir} \
         --net_name=${net} \
-        --arch=/workspace/Vitis-AI-Tutorials/files/Ultra96/dpu_info/B2304_custom/ULTRA96V2.json 2>&1 | tee ${output_dir}/compile.txt
+        --arch=/workspace/Vitis-AI-Tutorials/dpu_info/ULTRA96V2.json 2>&1 | tee ${output_dir}/compile.txt

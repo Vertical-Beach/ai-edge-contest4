@@ -8,10 +8,8 @@ layer {
     phase:TRAIN
   }
   image_data_param {
-    # source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_calibration.txt"
-    source: "/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/signate_test_calibration.txt"
-    # root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_train_images/"
-    root_folder:"/workspace/Vitis-AI-Tutorials/files/Segment/workspace/data/signate/seg_test_images/"
+    source: "/workspace/Vitis-AI-Tutorials/data/bdd100k/seg/calib_files.txt"
+    root_folder:"/workspace/Vitis-AI-Tutorials/data/bdd100k/seg/images/train/"
     batch_size: 1
     new_height: 320
     new_width: 640
