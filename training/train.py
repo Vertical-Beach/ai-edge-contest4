@@ -26,7 +26,7 @@ network = FPNResnet18(num_classes=5).cuda()
 network.model_dir = "./training_logs/{}".format(model_id)
 network.checkpoints_dir = "./training_logs/{}/checkpoints".format(model_id)
 
-network.load_state_dict(torch.load("./converted.pth"))
+network.load_state_dict(torch.load("./pretrained.pth"))
 
 import os
 os.makedirs(network.model_dir, exist_ok=True)
