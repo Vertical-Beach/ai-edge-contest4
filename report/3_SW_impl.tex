@@ -88,12 +88,14 @@ postproc FIFOにデータを入れる処理の処理時間を $t_{\mathrm{push}}
 
 \begin{equation}
   \label{equ:inference-pred}
-    t_{\mathrm{inference}}^* = t_{\mathrm{max}} + \frac{t_{\mathrm{pre}} + t_{\mathrm{post}}}{N} + t_\alpha \\
+    t_{\mathrm{inference}}^* = t_{\mathrm{bottolneck}} + \frac{t_{\mathrm{pre}} + t_{\mathrm{infer}} + t_{\mathrm{post}} - t_{\mathrm{bottolneck}}}{N} + t_\alpha \\
 \end{equation}
 \begin{equation*}
     \begin{split}
-      \text{where} \quad t_{\mathrm{max}} &= \max \{t_{\mathrm{pre}}, t_{\mathrm{pop}} + t_{\mathrm{dpu}} + t_{\mathrm{push}}, t_{\mathrm{post}}\}, \\
-      t_{\mathrm{pre}} &= t_{\mathrm{pre\_resize}} + t_{\mathrm{pre\_normalize}}, \\
+      \text{where} \quad
+      t_{\mathrm{bottolneck}}  &= \max \{t_{\mathrm{pre}}, t_{\mathrm{infer}}, t_{\mathrm{post}}\}, \\
+      t_{\mathrm{pre}}  &= t_{\mathrm{pre\_resize}} + t_{\mathrm{pre\_normalize}}, \\
+      t_{\mathrm{infer}} &= t_{\mathrm{pop}} + t_{\mathrm{dpu}} + t_{\mathrm{push}}, \\
       t_{\mathrm{post}} &= t_{\mathrm{post\_labeling}} + t_{\mathrm{post\_resize}}
     \end{split}
 \end{equation*}
