@@ -10,6 +10,8 @@ DNN model and inference code is based on [Xilinx ML-Caffe-Segmentation-Tutorial]
 Training code is based on [fregu856/deeplabv3](https://github.com/fregu856/deeplabv3).  
 Environments: Ubuntu18.04 and Vitis-AI v1.1
 
+See the [report](./report/main.pdf) for more details.
+
 # Files
 - app  
   Evaluation applications on Ultra96
@@ -22,6 +24,10 @@ Environments: Ubuntu18.04 and Vitis-AI v1.1
      model definition files for Xilinx Caffe.
   - Segment/VAI  
      model quantize and compile scripts for Vitis-AI quantizer and compiler.
+- report  
+  implementation report for the competition (written in Japanese)
+- submission_material  
+  submission material for the competition
 - training  
     training scripts on PyTorch
 - utils
