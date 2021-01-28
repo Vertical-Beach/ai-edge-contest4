@@ -409,7 +409,7 @@ The implementation is based on `cf_fpn_cityscapes_256_512_8.9G` on [Xilinx's AI-
 The input flame size of DPU is modified to 256\*512 to 320\*640
 The application achieved about 15.5fps, which is slower than the original implementation that achieved 27 FPS.
 
-Demo Video (Youtube Link):
+Demo Video (Youtube Link):  
 [![](http://img.youtube.com/vi/0OF19EB_FHQ/0.jpg)](http://www.youtube.com/watch?v=0OF19EB_FHQ "")
 
 # References
