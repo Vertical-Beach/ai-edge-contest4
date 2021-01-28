@@ -1,0 +1,235 @@
+\documentclass[11pt,a4j]{jarticle}
+
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{ascmac}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage[dvips,usenames,dvipdfmx]{color}
+\usepackage{colortbl}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{url}
+\usepackage[top=30.5truemm,bottom=30.5truemm,left=22.5truemm,right=22.5truemm]{geometry}
+\usepackage{listings}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\algtext*{EndIf}
+\algtext*{EndFor}
+\algtext*{EndWhile}
+
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+\newcommand{\Continue}{\textbf{continue}}
+\newcommand{\Break}{\textbf{break}}
+
+\definecolor{bl}{rgb}{0.94,0.97,1}
+\definecolor{gr}{rgb}{0.5,0.5,0.5}
+\makeatletter
+\def\section{\@startsection{section}{1}{\z@}{2.3ex plus -1ex minus -.2ex}{2.3 ex plus .2ex}{\Large\bf}}
+\makeatother
+
+\setstretch{1.5}
+
+\usepackage{fancyhdr}
+\lhead{\leftmark}
+\chead{}
+\rhead{\rightmark}
+\cfoot{\thepage}
+
+\rfoot{}
+
+\lstset{
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+  keywordstyle={\small\bfseries \color[rgb]{0,0,0.8}},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+  frame={tb},
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex,
+  morecomment=[l]{//},
+  breaklines=true,
+  showstringspaces=\false,
+}
+
+\begin{document}
+\vspace*{2cm}
+\thispagestyle{empty}
+% \begin{spacing}{1}
+  \begin{center}
+    {
+      \Large 第4回 AIエッジコンテスト レポート
+    } \\[3.5truecm]
+    \LARGE
+    \Large チーム名 Vertical\_Beach \\
+    \Large lp6m, medalotte \\
+  \end{center}
+
+  % \clearpage
+  % \pagenumbering{roman}
+  %               {\fontsize{11pt}{15pt}\selectfont
+  %                 \tableofcontents
+  %               }
+% \end{spacing}
+
+\clearpage
+\pagenumbering{arabic}
+\pagestyle{fancy}
+
+\input{1_introduction.tex}
+\input{2_HW_impl.tex}
+\input{3_SW_impl.tex}
+\input{4_evaluation.tex}
+% \input{5_conclusion.tex}
+
+\pagestyle{plain}
+\bibliographystyle{plain}
+% \bibliographystyle{junsrt}
+\bibliography{main.bib}
+\newpage
+\section*{付録}
+\addcontentsline{toc}{section}{付録}
+
+\setcounter{lstnumber}{1}
+\begin{lstlisting}[language=c++,firstnumber=last,caption=MultiThreadFIFO,label=code:muitithreadfifo][h]
+template<typename T>
+class ObjWithMtx {
+public:
+  T obj;
+  ObjWithMtx() = default;
+  ObjWithMtx(const T& _obj) : obj(_obj) {}
+  void operator =(const ObjWithMtx& obj) = delete;
+  ObjWithMtx(const ObjWithMtx& obj) = delete;
+  void lock() { mtx_.lock(); }
+  bool try_lock() { return mtx_.try_lock(); }
+  void unlock() { mtx_.unlock(); }
+private:
+  std::mutex mtx_;
+};
+
+template<typename T, size_t D>
+class MultiThreadFIFO {
+public:
+  MultiThreadFIFO(const uint32_t& sleep_t_us = 100) :
+    sleep_t_us_(sleep_t_us) {
+    init();
+  }
+
+  void operator =(const MultiThreadFIFO& obj) = delete;
+  MultiThreadFIFO(const MultiThreadFIFO& obj) = delete;
+
+  void init() {
+    std::unique_lock<std::mutex> lock_w_func(w_func_guard_, std::try_to_lock);
+    std::unique_lock<std::mutex> lock_r_func(r_func_guard_, std::try_to_lock);
+    if (!lock_w_func.owns_lock() || !lock_r_func.owns_lock()) {
+      throw std::runtime_error("[ERROR] Initialization of the FIFO failed.");
+    }
+    for (auto& state : fifo_state_) {
+      std::lock_guard<ObjWithMtx<ElementState>> lock_state(state);
+      state.obj = ElementState::INVALID;
+    }
+    r_idx_ = 0;
+    w_idx_ = 0;
+  }
+
+  void write(ObjWithMtx<bool>& no_abnormality, const bool& is_last, std::function<void(T&)> write_func) {
+    std::unique_lock<std::mutex> lock_w_func(w_func_guard_, std::try_to_lock);
+    if (!lock_w_func.owns_lock()) {
+      throw std::runtime_error("[ERROR] The write function can't be called at the same time from multiple threads.");
+    }
+    while (true) {
+      {
+        std::lock_guard<ObjWithMtx<ElementState>> lock_state(fifo_state_[w_idx_]);
+        if (fifo_state_[w_idx_].obj == ElementState::INVALID) {
+          break;
+        } else {
+          std::lock_guard<ObjWithMtx<bool>> lock(no_abnormality);
+          if (no_abnormality.obj == false) {
+            throw std::runtime_error("[ERROR] Terminate write process.");
+          }
+        }
+      }
+      std::this_thread::sleep_for(std::chrono::microseconds(sleep_t_us_));
+    }
+    {
+      std::lock_guard<ObjWithMtx<T>> lock_fifo(fifo_[w_idx_]);
+      write_func(fifo_[w_idx_].obj);
+    }
+    {
+      std::lock_guard<ObjWithMtx<ElementState>> lock_state(fifo_state_[w_idx_]);
+      fifo_state_[w_idx_].obj = is_last ? ElementState::VALID_LAST : ElementState::VALID;
+    }
+    incrementIdx(w_idx_);
+  }
+
+  void read(ObjWithMtx<bool>& no_abnormality, std::function<void(const T&)> read_func) {
+    std::unique_lock<std::mutex> lock_r_func(r_func_guard_, std::try_to_lock);
+    if (!lock_r_func.owns_lock()) {
+      throw std::runtime_error("[ERROR] The read function can't be called at the same time from multiple threads.");
+    }
+    while (true) {
+      {
+        std::lock_guard<ObjWithMtx<ElementState>> lock_state(fifo_state_[r_idx_]);
+        if (fifo_state_[r_idx_].obj == ElementState::VALID ||
+            fifo_state_[r_idx_].obj == ElementState::VALID_LAST) {
+          break;
+        } else {
+          std::lock_guard<ObjWithMtx<bool>> lock(no_abnormality);
+          if (no_abnormality.obj == false) {
+            throw std::runtime_error("[ERROR] Terminate read process.");
+          }
+        }
+      }
+      std::this_thread::sleep_for(std::chrono::microseconds(sleep_t_us_));
+    }
+    {
+      std::lock_guard<ObjWithMtx<T>> lock_fifo(fifo_[r_idx_]);
+      read_func(fifo_[r_idx_].obj);
+    }
+    {
+      std::lock_guard<ObjWithMtx<ElementState>> lock_state(fifo_state_[r_idx_]);
+      if (fifo_state_[r_idx_].obj == ElementState::VALID) {
+          fifo_state_[r_idx_].obj = ElementState::INVALID;
+        incrementIdx(r_idx_);
+      } else {
+        fifo_state_[r_idx_].obj = ElementState::INVALID_LAST;
+      }
+    }
+  }
+
+  bool neverReadNextElement() {
+    std::unique_lock<std::mutex> lock_r_func(r_func_guard_, std::try_to_lock);
+    if (!lock_r_func.owns_lock()) {
+      throw std::runtime_error("[ERROR] The read function can't be called at the same time from multiple threads.");
+    }
+    std::lock_guard<ObjWithMtx<ElementState>> lock_state(fifo_state_[r_idx_]);
+    return (fifo_state_[r_idx_].obj == ElementState::INVALID_LAST);
+  }
+
+private:
+  enum class ElementState { VALID, VALID_LAST, INVALID, INVALID_LAST };
+
+  void incrementIdx(size_t& idx) const {
+    idx = (idx < D - 1) ? idx + 1 : 0;
+  }
+
+  const uint32_t sleep_t_us_;
+  std::array<ObjWithMtx<T>, D> fifo_;
+  std::array<ObjWithMtx<ElementState>, D> fifo_state_;
+  std::mutex r_func_guard_, w_func_guard_;
+  size_t r_idx_{0}, w_idx_{0};
+};
+\end{lstlisting}
+
+\end{document}
