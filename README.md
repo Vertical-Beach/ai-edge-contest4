@@ -419,4 +419,4 @@ Demo Video (Youtube Link):
 - https://github.com/bermanmaxim/LovaszSoftmax
 
 # Licence
-<!-- MIT? -->
+Apache License 2.0
