@@ -8,6 +8,8 @@ The training code also supports training on the BDD100K dataset.
 
 * DNN model and inference code is based on [Xilinx ML-Caffe-Segmentation-Tutorial](https://github.com/Xilinx/Vitis-AI-Tutorials/tree/ML-Caffe-Segmentation-Tutorial).
 * Training code is based on [fregu856/deeplabv3](https://github.com/fregu856/deeplabv3).
+* [Lovasz-Loss](https://github.com/bermanmaxim/LovaszSoftmax) is adopted at training phase instead of Cross-Entropy Loss
+* The applications run multi-threaded to execute efficiently
 
 The mIoU score using the contest evaluation data is **0.6014857**.
 
