@@ -18,25 +18,24 @@ See the [report (Japanese)](./report/main.pdf) for more details.
 * Vitis-AI v1.1
 
 ## Files
-- app
-  applications of semantic segmentation running on the Ultra96-V2
-- data
-  BDD100K/SIGNATE dataset will be stored
-- dpu_info
-  DPU configuration data for the Vitis-AI quantizer and compiler
-- files
-  - Segment/workspace
-     model definition files for the Xilinx Caffe
-  - Segment/VAI
-     model quantize and compile scripts for the Vitis-AI quantizer and compiler.
-- report
-  implementation report for the contest (written in Japanese)
-- submission_material
-  submission materials for the contest
-- training
-  training scripts on PyTorch
-- utils
-  weight convert scripts between PyTorch and Caffe and signate dataset utils
+- `./app`
+  - applications of semantic segmentation running on the Ultra96-V2
+- `./data`
+  - BDD100K/SIGNATE dataset will be stored
+- `./dpu_info`
+  - DPU configuration data for the Vitis-AI quantizer and compiler
+- `./files/Segment/workspace`
+  - model definition files for the Xilinx Caffe
+- `./files/Segment/VAI`
+  - model quantize and compile scripts for the Vitis-AI quantizer and compiler.
+- `./report`
+  - implementation report for the contest (written in Japanese)
+- `./submission_material`
+  - submission materials for the contest
+- `./training`
+  - training scripts on PyTorch
+- `./utils`
+  - weight convert scripts between PyTorch and Caffe and signate dataset utils
 
 ## Applications
 Two types of applications are implemented in `app` directory.
